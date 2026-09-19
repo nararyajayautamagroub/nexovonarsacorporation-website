@@ -56,7 +56,7 @@ for (const r of selected) {
   const workflows = await optional(`/repos/${OWNER}/${r.name}/actions/runs?per_page=1`, { workflow_runs: [] });
   const branches = await optional(`/repos/${OWNER}/${r.name}/branches?per_page=100`, []);
   const issues = await optional(`/repos/${OWNER}/${r.name}/issues?state=open&per_page=100`, []);
-  const root = await optional(`/repos/${OWNER}/${r.name}/contents/${r.default_branch}`, []);
+  const root = await optional(`/repos/${OWNER}/${r.name}/contents/?ref=${encodeURIComponent(r.default_branch)}`, []);
   const rootItems = Array.isArray(root) ? root : [];
   const topLevelFiles = rootItems.filter(x => x.type === 'file').map(x => x.name).sort();
   const topLevelDirectories = rootItems.filter(x => x.type === 'dir').map(x => x.name).sort();
