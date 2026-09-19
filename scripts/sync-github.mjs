@@ -15,7 +15,7 @@ async function gh(path) {
 }
 async function optional(path, fallback) {
   try { return await gh(path); } catch (error) {
-    console.warn(`GitHub API fallback: ${error.message}`);
+    console.info(`GitHub API fallback: ${error.message}`);
     return fallback;
   }
 }
@@ -38,7 +38,7 @@ let repos = [];
 try {
   repos = await paged(`/user/repos?affiliation=owner&visibility=all&sort=updated`);
 } catch (error) {
-  console.warn(`Authenticated repository listing unavailable: ${error.message}`);
+  console.info(`Authenticated repository listing unavailable: ${error.message}`);
   repos = await paged(`/users/${OWNER}/repos?type=owner&sort=updated`);
 }
 
