@@ -1,0 +1,37 @@
+name: Corporate Quality Gate
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Syntax check
+        run: |
+          node --check app.js
+          node --check data.js
+          node --check portfolio.js
+          node --check github-live.js
+          node --check scripts/sync-github.mjs
+      - name: Data bootstrap check
+        run: |
+          node - <<'NODE'
+          global.window = {};
+          require('./data.js');
+          require('./portfolio.js');
+          require('./github-live.js');
+          if (!window.CORPORATE_DATA) throw new Error('CORPORATE_DATA missing');
+          if (!Array.isArray(window.CORPORATE_DATA.projects)) throw new Error('Project array missing');
+          if (!window.GITHUB_LIVE_DATA || !Array.isArray(window.GITHUB_LIVE_DATA.records)) throw new Error('GitHub snapshot missing');
+          console.log('Projects:', window.CORPORATE_DATA.projects.length);
+          console.log('Repositories:', window.GITHUB_LIVE_DATA.records.length);
+          NODE
