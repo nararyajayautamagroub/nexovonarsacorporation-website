@@ -56,6 +56,11 @@ for (const r of selected) {
   const workflows = await optional(`/repos/${OWNER}/${r.name}/actions/runs?per_page=1`, { workflow_runs: [] });
   const branches = await optional(`/repos/${OWNER}/${r.name}/branches?per_page=100`, []);
   const issues = await optional(`/repos/${OWNER}/${r.name}/issues?state=open&per_page=100`, []);
+  const root = await optional(`/repos/${OWNER}/${r.name}/contents/${r.default_branch}`, []);
+  const rootItems = Array.isArray(root) ? root : [];
+  const topLevelFiles = rootItems.filter(x => x.type === 'file').map(x => x.name).sort();
+  const topLevelDirectories = rootItems.filter(x => x.type === 'dir').map(x => x.name).sort();
+  const manifests = ['package.json','package-lock.json','pnpm-lock.yaml','yarn.lock','requirements.txt','pyproject.toml','Cargo.toml','go.mod','composer.json','README.md','LICENSE'].filter(x => rootItems.some(y => y.name === x));
   const prs = issues.filter(x => !!x.pull_request).length;
   const lastCommit = commits[0] || null;
   const run = workflows.workflow_runs?.[0] || null;
@@ -78,6 +83,11 @@ for (const r of selected) {
     openIssues: issues.length - prs,
     openPullRequests: prs,
     branches: branches.length,
+    topLevelFileCount: topLevelFiles.length,
+    topLevelDirectoryCount: topLevelDirectories.length,
+    topLevelFiles,
+    topLevelDirectories,
+    manifests,
     updatedAt: r.updated_at,
     pushedAt: r.pushed_at,
     latestCommit: lastCommit ? {
@@ -105,7 +115,13 @@ const snapshot = {
   source: TOKEN ? "GitHub API (authenticated)" : "GitHub API (public fallback)",
   repositoryCount: records.length,
   unmappedCount: records.filter(r => r.company === "UNMAPPED").length,
-  records
+  records,
+  integrity: {
+    mappedCount: records.filter(r => r.company !== 'UNMAPPED').length,
+    unmappedCount: records.filter(r => r.company === 'UNMAPPED').length,
+    privateCount: records.filter(r => r.private).length,
+    staleCount: records.filter(r => r.pushedAt && Date.now() - new Date(r.pushedAt).getTime() > 30 * 24 * 60 * 60 * 1000).length
+  }
 };
 
 await fs.writeFile(
