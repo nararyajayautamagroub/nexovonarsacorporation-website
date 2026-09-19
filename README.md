@@ -24,7 +24,7 @@ Internal-style single-page dashboard for monitoring the 2026–2030 corporate pr
 - `.github/workflows/deploy.yml` — GitHub Pages deployment
 
 ## Data governance
-The baseline follows the supplied Corporate Project Roadmap. Progress values are starter values where available; PIC, target, budget and similar operational fields remain `TBD` until the responsible project owner supplies actual data.
+The baseline follows the supplied Corporate Project Roadmap. Progress is shown only when an authoritative value exists in the project registry; otherwise it remains `TBD`. PIC, target, budget and similar operational fields remain `TBD` until the responsible project owner supplies actual data. The dashboard does not invent operational metrics.
 
 **Last Update:** 10/08/2026  
 **Planning Period:** 2026–2030  
