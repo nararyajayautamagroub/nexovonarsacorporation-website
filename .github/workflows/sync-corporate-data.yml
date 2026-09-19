@@ -2,24 +2,42 @@ name: Sync Corporate GitHub Intelligence
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "sync-config.json"
+      - "scripts/sync-github.mjs"
 
 permissions:
   contents: write
 
+concurrency:
+  group: corporate-data-sync
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate sync script
+        run: node --check scripts/sync-github.mjs
 
       - name: Sync repositories
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
           GITHUB_TOKEN: ${{ github.token }}
         run: node scripts/sync-github.mjs
+
+      - name: Validate generated snapshot
+        run: |
+          node --check github-live.js
+          node -e "global.window={}; require('./github-live.js'); if (!window.GITHUB_LIVE_DATA || !Array.isArray(window.GITHUB_LIVE_DATA.records)) process.exit(1); console.log('Snapshot OK:', window.GITHUB_LIVE_DATA.repositoryCount)"
 
       - name: Commit live snapshot
         run: |
