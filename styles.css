@@ -10,3 +10,88 @@
 nav button.active{background:#fff;color:var(--action);border:1px solid var(--action)}
 nav button:hover{background:#fff;color:var(--action);border:1px solid var(--action)}
 @media(max-width:760px){#menu{display:grid!important}}
+
+/* Global button motion system */
+button,
+.btn,
+#menu,
+.close {
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: center;
+  transition:
+    transform .16s cubic-bezier(.2,.8,.2,1),
+    background-color .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    opacity .18s ease;
+  will-change: transform;
+}
+button:not(:disabled):hover,
+.btn:not(:disabled):hover {
+  transform: translateY(-2px) scale(1.015);
+}
+button:not(:disabled):active,
+.btn:not(:disabled):active {
+  transform: translateY(0) scale(.96);
+  transition-duration: .07s;
+}
+button:disabled,
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+nav button {
+  position: relative;
+  overflow: hidden;
+}
+nav button::after,
+.btn::after,
+#menu::after,
+.close::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(22,119,255,.24) 0, rgba(22,119,255,0) 62%);
+  opacity: 0;
+  transform: scale(.55);
+}
+nav button:active::after,
+.btn:active::after,
+#menu:active::after,
+.close:active::after {
+  animation: buttonPulse .32s ease-out;
+}
+@keyframes buttonPulse {
+  0% { opacity: .9; transform: scale(.55); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+.btn,
+#menu {
+  box-shadow: 0 1px 0 rgba(255,255,255,.05);
+}
+.btn:hover,
+#menu:hover,
+.close:hover {
+  box-shadow: 0 7px 18px rgba(22,119,255,.18);
+}
+nav button.active {
+  box-shadow: 0 5px 14px rgba(22,119,255,.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .btn,
+  #menu,
+  .close {
+    transition: none !important;
+    animation: none !important;
+  }
+  nav button::after,
+  .btn::after,
+  #menu::after,
+  .close::after {
+    display: none;
+  }
+}
