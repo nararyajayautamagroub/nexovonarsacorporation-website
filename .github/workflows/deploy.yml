@@ -1,4 +1,4 @@
-name: Deploy NEXOVONARSA Corporation to GitHub Pages
+name: Publish NEXOVONARSA Corporation static site
 
 on:
   push:
@@ -6,34 +6,42 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: static-site-publish
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
         with:
-          enablement: true
+          fetch-depth: 0
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "."
+      - name: Validate JavaScript
+        run: |
+          node --check app.js
+          node --check data.js
+          node --check portfolio.js
+          node --check github-live.js
 
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Stage static site
+        run: |
+          rm -rf /tmp/nexovonarsa-site
+          mkdir -p /tmp/nexovonarsa-site
+          cp index.html styles.css data.js portfolio.js app.js github-live.js /tmp/nexovonarsa-site/
+          touch /tmp/nexovonarsa-site/.nojekyll
+
+      - name: Publish gh-pages branch
+        run: |
+          git config user.name "NEXOVONARSA Static Publisher"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch --orphan gh-pages
+          git rm -rf . || true
+          cp -R /tmp/nexovonarsa-site/. .
+          git add .
+          git commit -m "deploy: publish corporate control center"
+          git push origin gh-pages --force
