@@ -70,16 +70,19 @@ nav button:active::after,
 }
 .btn,
 #menu {
-  box-shadow: 0 1px 0 rgba(255,255,255,.05);
+  box-shadow: 0 2px 6px rgba(0,0,0,.12);
 }
+
 .btn:hover,
 #menu:hover,
 .close:hover {
-  box-shadow: 0 7px 18px rgba(22,119,255,.18);
+  box-shadow: 0 4px 10px rgba(22,119,255,.14);
 }
+
 nav button.active {
-  box-shadow: 0 5px 14px rgba(22,119,255,.12);
+  box-shadow: 0 3px 8px rgba(22,119,255,.10);
 }
+
 @media (prefers-reduced-motion: reduce) {
   button,
   .btn,
