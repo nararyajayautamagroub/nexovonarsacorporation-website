@@ -46,4 +46,16 @@ jobs:
           git add github-live.js
           git diff --cached --quiet && exit 0
           git commit -m "chore: refresh GitHub corporate data"
-          git push
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if git rebase origin/main; then
+              if git push origin HEAD:main; then
+                exit 0
+              fi
+            else
+              git rebase --abort || true
+            fi
+            sleep 3
+          done
+          echo "Unable to publish snapshot after 3 attempts because main changed concurrently."
+          exit 1
