@@ -111,6 +111,7 @@ const scrapeWindow = {};
 boot("external-live.js", scrapeLiveSource, scrapeWindow);
 const scrapeData = scrapeWindow.SCRAPE_LIVE_DATA;
 if (!scrapeData || !Array.isArray(scrapeData.sources)) fail("SCRAPE_LIVE_DATA.sources is missing");
+if (scrapeData && Number(scrapeData.blockedCount||0) < 0) fail("SCRAPE_LIVE_DATA.blockedCount is invalid");
 
 const scrapeConfig = JSON.parse(await read("scrape-config.json"));
 unique((scrapeConfig.sources || []).map(function (x) { return x.id; }), "scraper source id");
@@ -159,6 +160,7 @@ secretPatterns.forEach(function (pattern) {
 
 if (!/prefers-reduced-motion/.test(css)) warn("Reduced motion support is missing");
 if (scrapeData && scrapeData.failedCount > 0) warn("Generated scraper snapshot contains " + scrapeData.failedCount + " failed source(s)");
+if (scrapeData && scrapeData.blockedCount > scrapeData.failedCount) fail("Scraper blockedCount exceeds failedCount");
 if (!/signInWithPassword/.test(authSource) ||
     !/signUp/.test(authSource) ||
     !/signInWithOAuth/.test(authSource) ||
