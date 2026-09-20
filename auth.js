@@ -91,14 +91,23 @@
     var body=document.getElementById("authBody");
     if(!body)return;
     if(state.user){
+      var meta=state.user.user_metadata||{};
+      var t2=window.NX_T||function(x){return x};
       body.innerHTML='<div class="account-profile">'+
         '<div class="avatar">'+e(profileName(state.user).slice(0,1).toUpperCase())+'</div>'+
         '<div><strong>'+e(profileName(state.user))+'</strong><small>'+e(state.user.email||"")+'</small></div>'+
       '</div>'+
-      '<div class="auth-actions"><button class="btn" id="authLogout">'+(window.NX_T?window.NX_T("common.logout"):"Sign out")+'</button><button class="btn" id="authAccountSettings">'+(window.NX_T?window.NX_T("common.settings"):"Settings")+'</button></div>'+
+      '<div class="auth-stack">'+
+        '<label><span>'+e(t2("common.name"))+'</span><input id="authProfileName" value="'+e(meta.full_name||meta.name||"")+'" maxlength="80" autocomplete="name"></label>'+
+        '<label><span>'+e(t2("common.email"))+'</span><input value="'+e(state.user.email||"")+'" disabled></label>'+
+        '<label><span>'+e(t2("common.newPassword"))+'</span><input id="authNewPassword" type="password" minlength="8" autocomplete="new-password"></label>'+
+      '</div>'+
+      '<div class="auth-actions"><button class="btn primary" id="authSaveProfile">'+e(t2("common.save"))+'</button><button class="btn" id="authResend">'+e(t2("common.resendVerification"))+'</button><button class="btn" id="authLogout">'+e(t2("common.logout"))+'</button><button class="btn" id="authAccountSettings">'+e(t2("common.settings"))+'</button></div>'+
       '<div id="authMessage" class="auth-message"></div>';
       document.getElementById("authLogout").onclick=logout;
       document.getElementById("authAccountSettings").onclick=function(){close();if(window.NX_EXPERIENCE)window.NX_EXPERIENCE.openSettings()};
+      document.getElementById("authSaveProfile").onclick=saveProfile;
+      document.getElementById("authResend").onclick=resendVerification;
       return;
     }
     var mode=document.getElementById("authModal").dataset.mode||"login";
@@ -157,6 +166,31 @@
     if(!email){message("Masukkan email terlebih dahulu.",false);return}
     var result=await client.auth.resetPasswordForEmail(email,{redirectTo:getRedirect()});
     if(result.error)message(result.error.message,false);else message("Link reset password telah dikirim jika email valid.",true);
+  }
+
+  async function saveProfile(){
+    if(!client||!state.user){message("Login required.",false);return}
+    var name=document.getElementById("authProfileName").value.trim();
+    var password=document.getElementById("authNewPassword").value;
+    if(name.length<1||name.length>80){message("Name must contain 1-80 characters.",false);return}
+    if(password&&password.length<8){message("Password must contain at least 8 characters.",false);return}
+    var update={data:{full_name:name,name:name}};
+    if(password)update.password=password;
+    var result=await client.auth.updateUser(update);
+    if(result.error)message(result.error.message,false);else{
+      message(password?"Profile and password updated.":"Profile updated.",true);
+      var input=document.getElementById("authNewPassword");if(input)input.value="";
+    }
+  }
+
+  async function resendVerification(){
+    if(!client||!state.user||!state.user.email){message("Verification email is unavailable.",false);return}
+    var result=await client.auth.resend({
+      type:"signup",
+      email:state.user.email,
+      options:{emailRedirectTo:getRedirect()}
+    });
+    if(result.error)message(result.error.message,false);else message("Verification email request sent.",true);
   }
 
   async function logout(){
