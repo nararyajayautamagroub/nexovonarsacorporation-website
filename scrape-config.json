@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "timeoutMs": 12000,
   "maxBytes": 1500000,
   "sources": [
@@ -34,5 +34,9 @@
       "url": "https://github.com/nararyajayautamagroub/modbussid-converter"
     }
   ],
-  "revision": "2026.09.20-v4"
+  "revision": "2026.09.20-v4",
+  "respectRobots": true,
+  "maxRetries": 2,
+  "baseBackoffMs": 700,
+  "userAgent": "NEXOVONARSA-Corporate-Scraper/3.0"
 }
