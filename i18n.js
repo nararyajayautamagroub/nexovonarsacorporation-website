@@ -11,6 +11,17 @@ window.NX_I18N={
   es:{label:"Español",dir:"ltr",nav:{dashboard:"Panel",companies:"Empresas",projects:"Proyectos",repositories:"Repositorios",health:"Salud del sistema",sources:"Fuentes del scraper",roadmap:"Hoja de ruta",calendar:"Calendario",milestones:"Hitos",tasks:"Tareas",reports:"Informes",risks:"Riesgos",budget:"Presupuesto",documents:"Documentos",decisions:"Decisiones",notifications:"Notificaciones",team:"Equipo",activity:"Actividad",settings:"Ajustes"},common:{login:"Iniciar sesión",register:"Registrarse",logout:"Cerrar sesión",account:"Cuenta",language:"Idioma",theme:"Tema",system:"Sistema",light:"Claro",dark:"Oscuro",reducedMotion:"Reducir animaciones",autoRefresh:"Actualización automática",save:"Guardar",cancel:"Cancelar",close:"Cerrar",email:"Correo",password:"Contraseña",name:"Nombre",google:"Continuar con Google",forgot:"¿Olvidaste la contraseña?",back:"Volver",loading:"Cargando...",configured:"Configurado",notConfigured:"No configurado",profile:"Perfil",security:"Seguridad",appearance:"Apariencia",preferences:"Preferencias"}}
 };
 
+Object.assign(window.NX_I18N.id.common,{newPassword:"Password baru",resendVerification:"Kirim ulang verifikasi"});
+Object.assign(window.NX_I18N.en.common,{newPassword:"New password",resendVerification:"Resend verification"});
+Object.assign(window.NX_I18N.ms.common,{newPassword:"Kata laluan baharu",resendVerification:"Hantar semula pengesahan"});
+Object.assign(window.NX_I18N.vi.common,{newPassword:"Mật khẩu mới",resendVerification:"Gửi lại xác minh"});
+Object.assign(window.NX_I18N.th.common,{newPassword:"รหัสผ่านใหม่",resendVerification:"ส่งการยืนยันอีกครั้ง"});
+Object.assign(window.NX_I18N.zh.common,{newPassword:"新密码",resendVerification:"重新发送验证"});
+Object.assign(window.NX_I18N.ja.common,{newPassword:"新しいパスワード",resendVerification:"確認メールを再送信"});
+Object.assign(window.NX_I18N.ko.common,{newPassword:"새 비밀번호",resendVerification:"인증 메일 다시 보내기"});
+Object.assign(window.NX_I18N.ar.common,{newPassword:"كلمة مرور جديدة",resendVerification:"إعادة إرسال التحقق"});
+Object.assign(window.NX_I18N.es.common,{newPassword:"Nueva contraseña",resendVerification:"Reenviar verificación"});
+
 (function(){
   var saved=localStorage.getItem("nx-language");
   var fallback=window.NX_CONFIG&&window.NX_CONFIG.app&&window.NX_CONFIG.app.defaultLanguage||"id";
