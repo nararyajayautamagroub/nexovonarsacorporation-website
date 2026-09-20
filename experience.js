@@ -39,7 +39,7 @@
         '<label class="setting-row"><span>'+e(t("common.theme"))+'</span><select class="select" id="settingTheme"><option value="dark" '+(theme==="dark"?"selected":"")+'>'+e(t("common.dark"))+'</option><option value="light" '+(theme==="light"?"selected":"")+'>'+e(t("common.light"))+'</option><option value="system" '+(theme==="system"?"selected":"")+'>'+e(t("common.system"))+'</option></select></label>'+
         '<label class="setting-row check"><span>'+e(t("common.reducedMotion"))+'</span><input id="settingMotion" type="checkbox" '+(motion?"":"checked")+'></label>')+
       C(t("common.preferences"),'<label class="setting-row check"><span>'+e(t("common.autoRefresh"))+'</span><input id="settingRefresh" type="checkbox" '+(refresh?"checked":"")+'></label><div class="notice"><b>Data sync:</b> GitHub repository intelligence and public scraper snapshots are generated server-side by GitHub Actions. Browser settings do not expose credentials.</div>')+
-      C(t("common.security"),'<div class="notice"><b>Authentication:</b> '+e(window.NX_AUTH&&window.NX_AUTH.isConfigured()?t("common.configured"):t("common.notConfigured"))+'<br><b>Provider:</b> Supabase Auth · Email/Password + Google OAuth.</div>')+
+      C(t("common.security"),'<div class="notice"><b>Version:</b> '+e(window.NX_CONFIG&&window.NX_CONFIG.app&&window.NX_CONFIG.app.version||"5.2.0")+'<br><b>Authentication:</b> '+e(window.NX_AUTH&&window.NX_AUTH.isConfigured()?t("common.configured"):t("common.notConfigured"))+'<br><b>Provider:</b> Supabase Auth · Email/Password + Google OAuth.</div>')+
       '</div>';
   }
 
