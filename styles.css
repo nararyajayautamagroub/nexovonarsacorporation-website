@@ -208,3 +208,9 @@ img,svg,video{max-width:100%;height:auto}
   nav button,.btn,#menu,.close,.link-btn,.account-chip{min-height:44px}
   .close{width:44px;height:44px}
 }
+
+.auth-stack{display:grid;gap:10px;margin-top:14px}
+.auth-stack label{display:grid;gap:6px;color:#9eabb6;font-size:10px;font-weight:800}
+.auth-stack input{width:100%;border:1px solid var(--line);background:#080c11;color:var(--text);border-radius:8px;padding:11px 12px;outline:none}
+.auth-stack input:focus{border-color:var(--action);box-shadow:0 0 0 2px rgba(22,119,255,.12)}
+.auth-stack input:disabled{opacity:.55;cursor:not-allowed}
