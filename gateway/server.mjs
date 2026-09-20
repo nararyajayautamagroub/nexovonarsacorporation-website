@@ -50,6 +50,8 @@ async function serveStatic(req,res,requestPath){
 const server=http.createServer(async(req,res)=>{
   try{
     if(req.method!=="GET"&&req.method!=="HEAD")return send(res,405,"Method Not Allowed\n",{"allow":"GET, HEAD","content-type":"text/plain; charset=utf-8"});
+    const rawPath=String(req.url||"/").split("?")[0];
+    if(/(^|\/)\.\.(?:\/|$)|%2e|%2f|%5c/i.test(rawPath))return send(res,400,"Bad Request\\n",{"content-type":"text/plain; charset=utf-8"});
     const url=new URL(req.url||"/","http://"+(req.headers.host||"localhost"));
     if(url.pathname==="/api/health"){
       const body=JSON.stringify({ok:true,service:"nexovonarsa-corporate-gateway",version:"5.3.0",timestamp:new Date().toISOString()});
