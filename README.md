@@ -30,7 +30,7 @@ Internal-style single-page dashboard for monitoring the 2026–2030 corporate pr
 - `app.js` — dashboard logic, filters, detail view and CSV export
 - `scripts/sync-github.mjs` — GitHub repository intelligence sync
 - `scripts/scrape-public.mjs` — public HTTPS metadata scraper with robots, retries, size/type/redirect safety and generated telemetry
-- `scripts/validate.mjs` — automated structural/data validation
+- `scripts/validate.mjs` — automated structural/data validation\n- `scripts/smoke-test.mjs` — route-level browser-runtime smoke test\n- `gateway/server.mjs` — optional Node.js static gateway with `/api/health` and `/api/version`\n- `gateway/test.mjs` — gateway integration smoke test\n- `package.json` — npm scripts for check, smoke, test, gateway, scraper and GitHub sync
 - `scrape-config.json` — public scraper source registry
 - `external-live.js` — generated scraper snapshot\n- `icons/` — installable PWA icon assets
 - `.github/workflows/deploy.yml` — GitHub Pages deployment
@@ -92,3 +92,24 @@ Authentication is implemented with Supabase Auth in the browser. The repository 
 Google Sign-In requires the Google OAuth client plus Google provider configuration in Supabase. The setup steps are documented in [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md). For GitHub Pages, the deploy workflow can generate the published `config.js` from repository secrets `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; the source repository keeps only safe placeholders.
 
 The UI provides ten selectable languages and persists the selection locally. Theme, reduced motion and auto-refresh are also user settings. Authentication sessions are persisted by Supabase Auth rather than by storing raw passwords in the application.
+
+
+## NPM and Gateway Runtime
+
+The repository now has an npm contract for local/server execution:
+
+```bash
+npm install
+npm test
+npm start
+```
+
+The frontend remains deployable as a static GitHub Pages site. The optional Node.js gateway serves the same frontend and exposes health/version endpoints for VPS, container or reverse-proxy environments. The project intentionally uses no frontend npm runtime dependencies, so the install step stays deterministic and lightweight.
+
+See [docs/GATEWAY.md](docs/GATEWAY.md) for the gateway runbook.
+
+## Copyright Footer
+
+Website and bot surfaces use the required footer:
+
+**PT. NEXOVONARSACORPORATION - All Right Reserved**
