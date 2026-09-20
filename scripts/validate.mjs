@@ -146,7 +146,7 @@ for (const ch of css) {
 if (depth !== 0) fail("styles.css has unbalanced braces");
 
 const secretPatterns = ["ghp_","github_pat_","Bearer github_","Authorization: Bearer","service_role"];
-const publicSource = html + dataSource + portfolioSource + appSource + liveSource;
+const publicSource = html + dataSource + portfolioSource + appSource + liveSource + configSource + i18nSource + authSource + experienceSource;
 secretPatterns.forEach(function (token) {
   if (publicSource.includes(token)) fail("Potential secret/token literal found: " + token);
 });
@@ -156,9 +156,10 @@ if (scrapeData && scrapeData.failedCount > 0) warn("Generated scraper snapshot c
 if (!/signInWithPassword/.test(authSource) || !/signUp/.test(authSource) || !/signInWithOAuth/.test(authSource) || !/provider:"google"/.test(authSource)) {
   fail("Authentication module is missing one or more required auth flows");
 }
-if (!/supportedLanguages/.test(configSource) || !Array.isArray((JSON.parse(configSource.match(/window\.NX_CONFIG=([\s\S]*?);\n?/)[1])).app.supportedLanguages) ) {
-  warn("Supported language configuration could not be inspected");
-}
+const supportedCodes=["id","en","ms","vi","th","zh","ja","ko","ar","es"];
+supportedCodes.forEach(function(code){
+  if(configSource.indexOf('"'+code+'"')===-1) warn("Language code missing from config.js: "+code);
+});
 
 if (repoData && repoData.unmappedCount > 0) warn("Generated GitHub snapshot contains " + repoData.unmappedCount + " unmapped repo(s)");
 
