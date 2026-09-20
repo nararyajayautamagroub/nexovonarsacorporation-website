@@ -27,12 +27,14 @@ jobs:
           node --check data.js
           node --check portfolio.js
           node --check github-live.js
+          node --check external-live.js
+          node scripts/validate.mjs
 
       - name: Stage static site
         run: |
           rm -rf /tmp/nexovonarsa-site
           mkdir -p /tmp/nexovonarsa-site
-          cp index.html styles.css data.js portfolio.js app.js github-live.js /tmp/nexovonarsa-site/
+          cp index.html styles.css data.js portfolio.js app.js github-live.js external-live.js /tmp/nexovonarsa-site/
           touch /tmp/nexovonarsa-site/.nojekyll
 
       - name: Publish gh-pages branch
