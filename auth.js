@@ -4,9 +4,9 @@
 
   function configured(){
     var cfg=window.NX_CONFIG&&window.NX_CONFIG.supabase||{};
-    return !!cfg.url && !!cfg.publishableKey &&
-      /^https:\/\/[^\s]+\.supabase\.co$/i.test(cfg.url) &&
-      !/^YOUR_/i.test(cfg.publishableKey);
+    var validUrl=false;
+    try{validUrl=new URL(cfg.url).protocol==="https:";}catch(error){validUrl=false}
+    return validUrl && !!cfg.publishableKey && !/^YOUR_/i.test(cfg.publishableKey) && !/service_role/i.test(cfg.publishableKey);
   }
 
   function getRedirect(){
