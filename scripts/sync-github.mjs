@@ -48,12 +48,15 @@ const discovered = new Map(
     .map(r => [r.name, r])
 );
 const configuredNames = [...allowed.keys()];
+const missingConfigured = [];
 for (const name of configuredNames) {
   if (discovered.has(name)) continue;
   try {
     const direct = await gh(`/repos/${OWNER}/${name}`);
     if (direct?.owner?.login === OWNER) discovered.set(name, direct);
+    else missingConfigured.push({ name, reason: "not returned by API" });
   } catch (error) {
+    missingConfigured.push({ name, reason: error && error.status ? String(error.status) : "access unavailable" });
     console.info(`Configured repository unavailable: ${name} · ${error.message}`);
   }
 }
@@ -131,11 +134,16 @@ const snapshot = {
   source: TOKEN ? "GitHub API (authenticated)" : "GitHub API (public fallback)",
   repositoryCount: records.length,
   unmappedCount: records.filter(r => r.company === "UNMAPPED").length,
+  configuredCount: configuredNames.length,
+  missingConfiguredCount: missingConfigured.length,
+  missingConfigured,
   records,
   integrity: {
     mappedCount: records.filter(r => r.company !== 'UNMAPPED').length,
     unmappedCount: records.filter(r => r.company === 'UNMAPPED').length,
     privateCount: records.filter(r => r.private).length,
+    privateCountKnown: true,
+    inaccessibleCount: missingConfigured.length,
     staleCount: records.filter(r => r.pushedAt && Date.now() - new Date(r.pushedAt).getTime() > 30 * 24 * 60 * 60 * 1000).length
   }
 };
@@ -151,6 +159,6 @@ console.log(
 );
 if (records.length < configuredNames.length) {
   console.info(
-    `Configured repositories: ${configuredNames.length}; accessible repositories synced: ${records.length}.`
+    `Configured repositories: ${configuredNames.length}; accessible repositories synced: ${records.length}; inaccessible configured repositories: ${missingConfigured.length}.`
   );
 }
