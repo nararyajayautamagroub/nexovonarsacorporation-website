@@ -6,7 +6,7 @@ const required = [
   "index.html","styles.css","data.js","portfolio.js","app.js","github-live.js",
   "external-live.js","sync-config.json","scrape-config.json",
   "scripts/sync-github.mjs","scripts/scrape-public.mjs","config.js","config.example.js",
-  "i18n.js","auth.js","experience.js","sw.js","pwa-manifest.webmanifest"
+  "i18n.js","auth.js","experience.js","sw.js","pwa-manifest.webmanifest","icons/icon.svg","icons/icon-192.svg","icons/icon-512.svg"
 ];
 const errors = [];
 const warnings = [];
@@ -190,6 +190,7 @@ if(!/PASSWORD_RECOVERY/.test(authSource)) fail("Password recovery event handler 
 if(!/authRecoveryPassword/.test(authSource) || !/authRecoveryConfirm/.test(authSource)) fail("Password recovery form is incomplete");
 if(!/icons\/icon\.svg/.test(html)) fail("Primary PWA icon is missing from index.html");
 if(!/icons\/icon-192\.svg/.test(html)) fail("192px PWA icon is missing from the repository shell");
+if(!/SUPABASE_URL/.test(await read(".github/workflows/deploy.yml")) || !/SUPABASE_PUBLISHABLE_KEY/.test(await read(".github/workflows/deploy.yml"))) fail("Deploy workflow is missing runtime Supabase secret support");
 
 if (repoData && repoData.unmappedCount > 0) info("Generated GitHub snapshot contains " + repoData.unmappedCount + " unmapped repo(s)");
 
