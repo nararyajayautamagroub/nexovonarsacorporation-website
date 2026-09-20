@@ -1,7 +1,7 @@
 {
   "name": "NEXOVONARSA CORPORATION",
   "short_name": "NEXOVONARSA",
-  "description": "NEXOVONARSA CORPORATION Project Control Center v5",
+  "description": "NEXOVONARSA CORPORATION Project Control Center v5.2.0",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#070a0e",
@@ -27,5 +27,6 @@
       "purpose": "any maskable"
     }
   ],
-  "scope": "./"
+  "scope": "./",
+  "version": "5.2.0"
 }
