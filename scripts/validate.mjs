@@ -13,6 +13,7 @@ const warnings = [];
 
 function fail(message) { errors.push(message); }
 function warn(message) { warnings.push(message); }
+function info(message) { console.log("INFO: " + message); }
 async function read(path) { return fs.readFile(path, "utf8"); }
 function nodeCheck(path) {
   const r = spawnSync(process.execPath, ["--check", path], { encoding: "utf8" });
@@ -158,8 +159,16 @@ secretPatterns.forEach(function (pattern) {
   if (pattern.test(publicSource)) fail("Potential credential/token literal detected");
 });
 
-if (!/prefers-reduced-motion/.test(css)) warn("Reduced motion support is missing");
-if (scrapeData && scrapeData.failedCount > 0) warn("Generated scraper snapshot contains " + scrapeData.failedCount + " failed source(s)");
+if (!/prefers-reduced-motion/.test(css)) fail("Reduced motion support is missing");
+if (!/\.\/app\.js/.test(await read("sw.js"))) fail("Service worker shell does not cache app.js");
+try {
+  const manifest=JSON.parse(await read("pwa-manifest.webmanifest"));
+  if (!Array.isArray(manifest.icons) || manifest.icons.length<2) fail("PWA manifest must define installable icons");
+  if (!manifest.scope || !manifest.start_url) fail("PWA manifest scope/start_url are incomplete");
+} catch (error) {
+  fail("Invalid pwa-manifest.webmanifest: "+error.message);
+}
+if (scrapeData && scrapeData.failedCount > 0) info("Generated scraper snapshot contains " + scrapeData.failedCount + " failed source(s)");
 if (scrapeData && scrapeData.blockedCount > scrapeData.failedCount) fail("Scraper blockedCount exceeds failedCount");
 if (!/signInWithPassword/.test(authSource) ||
     !/signUp/.test(authSource) ||
@@ -173,12 +182,16 @@ if (!/signInWithPassword/.test(authSource) ||
 if (!/createClient/.test(authSource) || !/autoRefreshToken:true/.test(authSource) || !/persistSession:true/.test(authSource)) {
   fail("Supabase auth client configuration is incomplete");
 }
+if (!/userAgent\)/.test(await read("scripts/scrape-public.mjs")) && !/config\.userAgent/.test(await read("scripts/scrape-public.mjs"))) fail("Scraper does not use configurable userAgent");
 const supportedCodes=["id","en","ms","vi","th","zh","ja","ko","ar","es"];
-supportedCodes.forEach(function(code){
-  if(configSource.indexOf('"'+code+'"')===-1) warn("Language code missing from config.js: "+code);
-});
+const languageCount=supportedCodes.filter(function(code){return i18nSource.indexOf(code+":")!==-1;}).length;
+if(languageCount!==supportedCodes.length) fail("Expected all 10 language dictionaries in i18n.js; found "+languageCount);
+if(!/PASSWORD_RECOVERY/.test(authSource)) fail("Password recovery event handler is missing");
+if(!/authRecoveryPassword/.test(authSource) || !/authRecoveryConfirm/.test(authSource)) fail("Password recovery form is incomplete");
+if(!/icons\/icon\.svg/.test(html)) fail("Primary PWA icon is missing from index.html");
+if(!/icons\/icon-192\.svg/.test(html)) fail("192px PWA icon is missing from the repository shell");
 
-if (repoData && repoData.unmappedCount > 0) warn("Generated GitHub snapshot contains " + repoData.unmappedCount + " unmapped repo(s)");
+if (repoData && repoData.unmappedCount > 0) info("Generated GitHub snapshot contains " + repoData.unmappedCount + " unmapped repo(s)");
 
 console.log("NEXOVONARSA validation");
 console.log("Errors: " + errors.length);
