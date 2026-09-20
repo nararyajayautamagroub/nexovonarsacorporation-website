@@ -9,6 +9,8 @@ on:
     paths:
       - "sync-config.json"
       - "scripts/sync-github.mjs"
+      - "scripts/scrape-public.mjs"
+      - "scrape-config.json"
 
 permissions:
   contents: write
