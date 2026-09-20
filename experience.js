@@ -117,5 +117,5 @@
   function openSettings(){if(typeof P!=="undefined"){P.page="settings";if(typeof render==="function")render()}}
 
   window.NX_EXPERIENCE={start:start,afterRender:afterRender,afterAuth:afterAuth,renderSettings:renderSettings,openSettings:openSettings,apply:apply};
-  function e(x){return String(x==null?"":x).replace(/[&<>"']/g,function(ch){var map={"&":"&amp;","<":"&lt;",">":"&gt;",""":"&quot;","'":"&#39;"};return map[ch]})}
+  function e(x){return String(x==null?"":x).replace(/[&<>"\']/g,function(ch){var map={"&":"&amp;","<":"&lt;",">":"&gt;"};map[String.fromCharCode(34)]="&quot;";map["\'"]="&#39;";return map[ch]||ch})}
 })();
