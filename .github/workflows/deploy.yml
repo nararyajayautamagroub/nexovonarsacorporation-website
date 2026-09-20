@@ -34,33 +34,38 @@ jobs:
           node --check i18n.js
           node --check sw.js
 
-      - name: Prepare runtime configuration
+      - name: Stage static site
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
         run: |
+          rm -rf /tmp/nexovonarsa-site
+          mkdir -p /tmp/nexovonarsa-site
+          cp index.html styles.css data.js portfolio.js app.js github-live.js external-live.js config.js config.example.js i18n.js auth.js experience.js sw.js pwa-manifest.webmanifest /tmp/nexovonarsa-site/
+          cp -R icons /tmp/nexovonarsa-site/
           node - <<'NODE'
           const fs = require("node:fs");
           const url = process.env.SUPABASE_URL || "";
           const key = process.env.SUPABASE_PUBLISHABLE_KEY || "";
-          if (!url || !key) {
-            console.log("Supabase deployment secrets are not configured; keeping safe placeholder config.js.");
-            process.exit(0);
+          if (url && key) {
+            const code = [
+              "window.NX_CONFIG={",
+              "supabase:" + JSON.stringify({url:url,publishableKey:key}) + ",",
+              "auth:{redirectTo:window.location.origin+window.location.pathname},",
+              "app:" + JSON.stringify({
+                defaultLanguage:"id",
+                supportedLanguages:["id","en","ms","vi","th","zh","ja","ko","ar","es"],
+                autoRefreshMinutes:15
+              }),
+              "};\\n"
+            ].join("");
+            fs.writeFileSync("/tmp/nexovonarsa-site/config.js", code, "utf8");
+            console.log("Runtime Supabase configuration prepared for the published site.");
+          } else {
+            console.log("Supabase deployment secrets are not configured; published site keeps the safe placeholder config.js.");
           }
-          const code = "window.NX_CONFIG=" + JSON.stringify({
-            supabase: { url, publishableKey: key },
-            auth: { redirectTo: "window.location.origin+window.location.pathname" },
-            app: { defaultLanguage: "id", supportedLanguages: ["id","en","ms","vi","th","zh","ja","ko","ar","es"], autoRefreshMinutes: 15 }
-          }) + ";\\n";
-          fs.writeFileSync("/tmp/nexovonarsa-site/config.js", code, "utf8");
-          console.log("Runtime Supabase configuration prepared without storing credentials in repository source.");
           NODE
-
-      - name: Stage static site
-        run: |
-          rm -rf /tmp/nexovonarsa-site
-          mkdir -p /tmp/nexovonarsa-site
-          cp index.html styles.css data.js portfolio.js app.js github-live.js external-live.js config.js config.example.js i18n.js auth.js experience.js sw.js pwa-manifest.webmanifest /tmp/nexovonarsa-site/
+          node --check /tmp/nexovonarsa-site/config.js
           touch /tmp/nexovonarsa-site/.nojekyll
 
       - name: Publish gh-pages branch
