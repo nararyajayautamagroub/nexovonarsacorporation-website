@@ -36,7 +36,7 @@ try{
   if(site.headers["x-content-type-options"]!=="nosniff")throw new Error("Security header missing");
   const missing=await request("/does-not-exist");
   if(missing.status!==404)throw new Error("404 route returned "+missing.status);
-  const traversal=await request("/../package.json");
+  const traversal=await request("/%2e%2e/package.json");
   if(traversal.status===200)throw new Error("Path traversal protection failed");
   console.log("Gateway smoke test passed.");
 }finally{
