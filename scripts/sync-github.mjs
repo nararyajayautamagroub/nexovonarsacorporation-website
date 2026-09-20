@@ -42,7 +42,23 @@ try {
   repos = await paged(`/users/${OWNER}/repos?type=owner&sort=updated`);
 }
 
-const selected = repos.filter(r => r.owner?.login === OWNER);
+const discovered = new Map(
+  repos
+    .filter(r => r.owner?.login === OWNER)
+    .map(r => [r.name, r])
+);
+const configuredNames = [...allowed.keys()];
+for (const name of configuredNames) {
+  if (discovered.has(name)) continue;
+  try {
+    const direct = await gh(`/repos/${OWNER}/${name}`);
+    if (direct?.owner?.login === OWNER) discovered.set(name, direct);
+  } catch (error) {
+    console.info(`Configured repository unavailable: ${name} · ${error.message}`);
+  }
+}
+
+const selected = [...discovered.values()];
 const records = [];
 
 for (const r of selected) {
@@ -130,4 +146,11 @@ await fs.writeFile(
   "utf8"
 );
 
-console.log(`Synced ${records.length} repositories; ${snapshot.unmappedCount} unmapped; ${snapshot.generatedAt}`);
+console.log(
+  `Synced ${records.length} repositories; ${snapshot.unmappedCount} unmapped; ${snapshot.generatedAt}`
+);
+if (records.length < configuredNames.length) {
+  console.info(
+    `Configured repositories: ${configuredNames.length}; accessible repositories synced: ${records.length}.`
+  );
+}
