@@ -1,4 +1,4 @@
-const CACHE="nx-corporate-v3";
+const CACHE="nx-corporate-v4";
 const SHELL=["./","./index.html","./styles.css","./data.js","./portfolio.js","./github-live.js","./external-live.js","./config.js","./i18n.js","./auth.js","./experience.js"];
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
