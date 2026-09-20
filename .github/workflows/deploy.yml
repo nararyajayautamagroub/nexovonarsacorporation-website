@@ -29,12 +29,16 @@ jobs:
           node --check github-live.js
           node --check external-live.js
           node scripts/validate.mjs
+          node --check auth.js
+          node --check experience.js
+          node --check i18n.js
+          node --check sw.js
 
       - name: Stage static site
         run: |
           rm -rf /tmp/nexovonarsa-site
           mkdir -p /tmp/nexovonarsa-site
-          cp index.html styles.css data.js portfolio.js app.js github-live.js external-live.js /tmp/nexovonarsa-site/
+          cp index.html styles.css data.js portfolio.js app.js github-live.js external-live.js config.js config.example.js i18n.js auth.js experience.js sw.js pwa-manifest.webmanifest /tmp/nexovonarsa-site/
           touch /tmp/nexovonarsa-site/.nojekyll
 
       - name: Publish gh-pages branch
