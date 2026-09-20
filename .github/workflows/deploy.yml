@@ -53,6 +53,7 @@ jobs:
               "supabase:" + JSON.stringify({url:url,publishableKey:key}) + ",",
               "auth:{redirectTo:window.location.origin+window.location.pathname},",
               "app:" + JSON.stringify({
+                version:"5.2.0",
                 defaultLanguage:"id",
                 supportedLanguages:["id","en","ms","vi","th","zh","ja","ko","ar","es"],
                 autoRefreshMinutes:15
