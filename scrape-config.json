@@ -34,7 +34,7 @@
       "url": "https://github.com/nararyajayautamagroub/modbussid-converter"
     }
   ],
-  "revision": "2026.09.20-v5",
+  "revision": "2026.09.20-v5.1",
   "respectRobots": true,
   "maxRetries": 3,
   "baseBackoffMs": 800,
