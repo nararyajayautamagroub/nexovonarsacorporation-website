@@ -5,7 +5,8 @@ import vm from "node:vm";
 const required = [
   "index.html","styles.css","data.js","portfolio.js","app.js","github-live.js",
   "external-live.js","sync-config.json","scrape-config.json",
-  "scripts/sync-github.mjs","scripts/scrape-public.mjs"
+  "scripts/sync-github.mjs","scripts/scrape-public.mjs","config.js","config.example.js",
+  "i18n.js","auth.js","experience.js","sw.js","pwa-manifest.webmanifest"
 ];
 const errors = [];
 const warnings = [];
@@ -44,7 +45,7 @@ for (const path of required) {
   try { await fs.access(path); } catch { fail("Missing required file: " + path); }
 }
 
-for (const path of ["data.js","portfolio.js","app.js","github-live.js","external-live.js","scripts/sync-github.mjs","scripts/scrape-public.mjs"]) {
+for (const path of ["data.js","portfolio.js","app.js","github-live.js","external-live.js","config.js","i18n.js","auth.js","experience.js","scripts/sync-github.mjs","scripts/scrape-public.mjs"]) {
   nodeCheck(path);
 }
 
@@ -55,8 +56,12 @@ const portfolioSource = await read("portfolio.js");
 const appSource = await read("app.js");
 const liveSource = await read("github-live.js");
 const scrapeLiveSource = await read("external-live.js");
+const configSource = await read("config.js");
+const i18nSource = await read("i18n.js");
+const authSource = await read("auth.js");
+const experienceSource = await read("experience.js");
 
-for (const src of ["data.js","portfolio.js","github-live.js","external-live.js","app.js"]) {
+for (const src of ["data.js","portfolio.js","github-live.js","external-live.js","config.js","i18n.js","auth.js","experience.js","app.js"]) {
   if (!html.includes('src="' + src + '"')) fail("index.html does not load " + src);
 }
 for (const id of ["nav","page","modal","toast","menu","sidebar","crumb"]) {
@@ -140,7 +145,7 @@ for (const ch of css) {
 }
 if (depth !== 0) fail("styles.css has unbalanced braces");
 
-const secretPatterns = ["ghp_","github_pat_","Bearer github_","Authorization: Bearer"];
+const secretPatterns = ["ghp_","github_pat_","Bearer github_","Authorization: Bearer","service_role"];
 const publicSource = html + dataSource + portfolioSource + appSource + liveSource;
 secretPatterns.forEach(function (token) {
   if (publicSource.includes(token)) fail("Potential secret/token literal found: " + token);
@@ -148,6 +153,13 @@ secretPatterns.forEach(function (token) {
 
 if (!/prefers-reduced-motion/.test(css)) warn("Reduced motion support is missing");
 if (scrapeData && scrapeData.failedCount > 0) warn("Generated scraper snapshot contains " + scrapeData.failedCount + " failed source(s)");
+if (!/signInWithPassword/.test(authSource) || !/signUp/.test(authSource) || !/signInWithOAuth/.test(authSource) || !/provider:"google"/.test(authSource)) {
+  fail("Authentication module is missing one or more required auth flows");
+}
+if (!/supportedLanguages/.test(configSource) || !Array.isArray((JSON.parse(configSource.match(/window\.NX_CONFIG=([\s\S]*?);\n?/)[1])).app.supportedLanguages) ) {
+  warn("Supported language configuration could not be inspected");
+}
+
 if (repoData && repoData.unmappedCount > 0) warn("Generated GitHub snapshot contains " + repoData.unmappedCount + " unmapped repo(s)");
 
 console.log("NEXOVONARSA validation");
