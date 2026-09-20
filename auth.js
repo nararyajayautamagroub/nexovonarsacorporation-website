@@ -1,6 +1,6 @@
 (function(){
   var client=null;
-  var state={user:null,session:null,configured:false};
+  var state={user:null,session:null,configured:false,recovery:false};
 
   function configured(){
     var cfg=window.NX_CONFIG&&window.NX_CONFIG.supabase||{};
@@ -25,11 +25,15 @@
       client.auth.getSession().then(function(result){
         state.session=result.data&&result.data.session||null;
         state.user=state.session&&state.session.user||null;
+        if(String(window.location.hash||"").indexOf("type=recovery")!==-1)state.recovery=true;
         render();
       }).catch(function(error){showMessage(error.message,false)});
       client.auth.onAuthStateChange(function(event,session){
         state.session=session||null;
         state.user=session&&session.user||null;
+        if(event==="PASSWORD_RECOVERY")state.recovery=true;
+        if(event==="SIGNED_OUT")state.recovery=false;
+        if(event==="SIGNED_IN" && event!=="PASSWORD_RECOVERY" && String(window.location.hash||"").indexOf("type=recovery")===-1)state.recovery=false;
         render();
         if(window.NX_EXPERIENCE&&window.NX_EXPERIENCE.afterAuth) window.NX_EXPERIENCE.afterAuth(event,state.user);
       });
@@ -90,6 +94,19 @@
     mount();
     var body=document.getElementById("authBody");
     if(!body)return;
+    if(state.user && state.recovery){
+      var tr=window.NX_T||function(x){return x};
+      body.innerHTML='<div class="account-profile"><div class="avatar">'+e(profileName(state.user).slice(0,1).toUpperCase())+'</div><div><strong>'+e(profileName(state.user))+'</strong><small>'+e(state.user.email||"")+'</small></div></div>'+
+        '<div class="auth-stack">'+
+        '<label><span>'+e(tr("common.newPassword"))+'</span><input id="authRecoveryPassword" type="password" minlength="8" autocomplete="new-password" required></label>'+
+        '<label><span>'+e(tr("common.confirmPassword"))+'</span><input id="authRecoveryConfirm" type="password" minlength="8" autocomplete="new-password" required></label>'+
+        '</div>'+
+        '<div class="auth-actions"><button class="btn primary" id="authRecoverySave">'+e(tr("common.setPassword"))+'</button><button class="btn" id="authRecoveryCancel">'+e(tr("common.cancel"))+'</button></div>'+
+        '<div id="authMessage" class="auth-message"></div>';
+      document.getElementById("authRecoverySave").onclick=saveRecovery;
+      document.getElementById("authRecoveryCancel").onclick=function(){state.recovery=false;render()};
+      return;
+    }
     if(state.user){
       var meta=state.user.user_metadata||{};
       var t2=window.NX_T||function(x){return x};
@@ -168,6 +185,21 @@
     if(result.error)message(result.error.message,false);else message("Link reset password telah dikirim jika email valid.",true);
   }
 
+  async function saveRecovery(){
+    if(!client||!state.user){message("Recovery session required.",false);return}
+    var password=document.getElementById("authRecoveryPassword").value;
+    var confirm=document.getElementById("authRecoveryConfirm").value;
+    if(password.length<8){message(window.NX_T?window.NX_T("common.passwordTooShort"):"Password must contain at least 8 characters.",false);return}
+    if(password!==confirm){message(window.NX_T?window.NX_T("common.passwordMismatch"):"Passwords do not match.",false);return}
+    message(window.NX_T?window.NX_T("common.loading"):"Loading...",true);
+    var result=await client.auth.updateUser({password:password});
+    if(result.error){message(result.error.message,false);return}
+    state.recovery=false;
+    history.replaceState(null,"",window.location.pathname+window.location.search);
+    render();
+    message(window.NX_T?window.NX_T("common.passwordUpdated"):"Password updated successfully.",true);
+  }
+
   async function saveProfile(){
     if(!client||!state.user){message("Login required.",false);return}
     var name=document.getElementById("authProfileName").value.trim();
@@ -194,6 +226,7 @@
   }
 
   async function logout(){
+    state.recovery=false;
     if(client)await client.auth.signOut();
     close();
   }
