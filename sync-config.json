@@ -2,12 +2,49 @@
   "owner": "nararyajayautamagroub",
   "intervalMinutes": 15,
   "repositories": [
-    {"name":"nararya-customer-service-platform","company":"NJU","unit":"Nararya Garage / Nararya Store / Corporate","project":"Nararya Customer Service Platform"},
-    {"name":"modbussid-converter","company":"NJU","unit":"Nararya Garage / Nararya Studio","project":"Game Mod Asset Lab"},
-    {"name":"nararya-bot-discord","company":"NJU","unit":"NARA48 / Community","project":"Nararya Bot Discord"},
-    {"name":"narasacakraperwana-website","company":"NCP","unit":"Virtual Transportation","project":"NARASA CAKRA PERWANA Website"},
-    {"name":"nararyastudio-website","company":"NJU","unit":"Nararya Studio","project":"Nararya Studio Website"},
-    {"name":"nararyagarage-website","company":"NJU","unit":"Nararya Garage","project":"Nararya Garage Website"},
-    {"name":"nexovonarsacorporation-website","company":"HQ","unit":"Corporate Headquarters","project":"Corporate Project Control Center"}
-  ]
+    {
+      "name": "nararya-customer-service-platform",
+      "company": "NJU",
+      "unit": "Nararya Garage / Nararya Store / Corporate",
+      "project": "Nararya Customer Service Platform"
+    },
+    {
+      "name": "modbussid-converter",
+      "company": "NJU",
+      "unit": "Nararya Garage / Nararya Studio",
+      "project": "Game Mod Asset Lab"
+    },
+    {
+      "name": "nararya-bot-discord",
+      "company": "NJU",
+      "unit": "NARA48 / Community",
+      "project": "Nararya Bot Discord"
+    },
+    {
+      "name": "narasacakraperwana-website",
+      "company": "NCP",
+      "unit": "Virtual Transportation",
+      "project": "NARASA CAKRA PERWANA Website"
+    },
+    {
+      "name": "nararyastudio-website",
+      "company": "NJU",
+      "unit": "Nararya Studio",
+      "project": "Nararya Studio Website"
+    },
+    {
+      "name": "nararyagarage-website",
+      "company": "NJU",
+      "unit": "Nararya Garage",
+      "project": "Nararya Garage Website"
+    },
+    {
+      "name": "nexovonarsacorporation-website",
+      "company": "HQ",
+      "unit": "Corporate Headquarters",
+      "project": "Corporate Project Control Center"
+    }
+  ],
+  "version": 2,
+  "includeConfiguredRepositories": true
 }
