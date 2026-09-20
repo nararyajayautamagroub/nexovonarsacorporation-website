@@ -42,25 +42,97 @@ function readCanonical(html) {
   return match ? match[1] : null;
 }
 
-async function fetchText(url, timeoutMs, maxBytes) {
-  const controller = new AbortController();
-  const timer = setTimeout(function () { controller.abort(); }, timeoutMs);
-  try {
-    const response = await fetch(url, {
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        "user-agent": USER_AGENT,
-        accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8"
-      }
-    });
-    if (!response.ok) throw new Error("HTTP " + response.status + " " + response.statusText);
-    const html = await response.text();
-    if (Buffer.byteLength(html, "utf8") > maxBytes) throw new Error("response exceeds " + maxBytes + " bytes");
-    return { html, status: response.status, finalUrl: response.url };
-  } finally {
-    clearTimeout(timer);
+const ROBOTS_CACHE = new Map();
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function retryDelay(response, baseDelay, attempt) {
+  const retryAfter = response.headers.get("retry-after");
+  const seconds = Number(retryAfter);
+  if (Number.isFinite(seconds)) return Math.max(baseDelay * (2 ** attempt), seconds * 1000);
+  const date = Date.parse(retryAfter || "");
+  if (Number.isFinite(date)) return Math.max(baseDelay * (2 ** attempt), date - Date.now());
+  return baseDelay * (2 ** attempt);
+}
+
+function robotsAllows(text, targetUrl, userAgent) {
+  const groups = [];
+  let current = null;
+  for (const raw of String(text || "").split(/\r?\n/)) {
+    const line = raw.split("#", 1)[0].trim();
+    if (!line || !line.includes(":")) continue;
+    const separator = line.indexOf(":");
+    const key = line.slice(0, separator).trim().toLowerCase();
+    const value = line.slice(separator + 1).trim();
+    if (key === "user-agent") {
+      current = { agents: [value.toLowerCase()], allow: [], disallow: [] };
+      groups.push(current);
+      continue;
+    }
+    if (!current) continue;
+    if (key === "allow" && value) current.allow.push(value);
+    if (key === "disallow" && value) current.disallow.push(value);
   }
+  const matching = groups.filter((group) => group.agents.includes("*") || group.agents.some((agent) => userAgent.toLowerCase().includes(agent)));
+  if (!matching.length) return true;
+  const allow = matching.flatMap((group) => group.allow).filter(Boolean);
+  const disallow = matching.flatMap((group) => group.disallow).filter(Boolean);
+  const path = targetUrl.pathname || "/";
+  const longest = (list) => list.filter((rule) => path.startsWith(rule)).sort((a, b) => b.length - a.length)[0] || "";
+  const blocked = longest(disallow);
+  const permitted = longest(allow);
+  return !blocked || permitted.length >= blocked.length;
+}
+
+async function robotsCheck(url, userAgent) {
+  const origin = new URL(url).origin;
+  if (ROBOTS_CACHE.has(origin)) return ROBOTS_CACHE.get(origin);
+  const robotsUrl = origin + "/robots.txt";
+  let result = { allowed: true, checked: true, url: robotsUrl, status: null };
+  try {
+    const response = await fetchText(robotsUrl, 8000, 300000);
+    result.status = response.status;
+    result.allowed = robotsAllows(response.html, new URL(url), userAgent);
+  } catch (error) {
+    result.error = error && error.message ? error.message : String(error);
+  }
+  ROBOTS_CACHE.set(origin, result);
+  return result;
+}
+
+async function fetchText(url, timeoutMs, maxBytes) {
+  const retries = Number(config.maxRetries) >= 0 ? Number(config.maxRetries) : 2;
+  const baseDelay = Number(config.baseBackoffMs) >= 0 ? Number(config.baseBackoffMs) : 700;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+    try {
+      const response = await fetch(url, {
+        redirect: "follow",
+        signal: controller.signal,
+        headers: {
+          "user-agent": USER_AGENT,
+          accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8"
+        }
+      });
+      const retryable = response.status === 408 || response.status === 425 || response.status === 429 || response.status >= 500;
+      if (response.ok) {
+        const html = await response.text();
+        if (Buffer.byteLength(html, "utf8") > maxBytes) throw new Error("response exceeds " + maxBytes + " bytes");
+        return { html, status: response.status, finalUrl: response.url, attempts: attempt + 1 };
+      }
+      if (!retryable || attempt === retries) throw new Error("HTTP " + response.status + " " + response.statusText);
+      await wait(retryDelay(response, baseDelay, attempt));
+    } catch (error) {
+      if (attempt === retries) throw error;
+      await wait(baseDelay * (2 ** attempt));
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw new Error("request exhausted");
 }
 
 async function scrapeSource(source) {
@@ -75,11 +147,30 @@ async function scrapeSource(source) {
     return { id: source.id, name: source.name, requestedUrl: target.href, ok: false, error: "Only HTTPS sources are allowed", durationMs: Date.now() - started, fetchedAt: new Date().toISOString() };
   }
   try {
+    const robots = config.respectRobots === false ? { allowed: true, checked: false } : await robotsCheck(target.href, USER_AGENT);
+    if (!robots.allowed) {
+      return {
+        id: source.id,
+        name: source.name,
+        requestedUrl: target.href,
+        ok: false,
+        blockedByRobots: true,
+        robotsUrl: robots.url,
+        robotsStatus: robots.status,
+        error: "Blocked by robots.txt",
+        durationMs: Date.now() - started,
+        fetchedAt: new Date().toISOString()
+      };
+    }
     const result = await fetchText(
       target.href,
       Number(config.timeoutMs) || 12000,
       Number(config.maxBytes) || 1500000
     );
+    const finalUrl = new URL(result.finalUrl);
+    if (finalUrl.protocol !== "https:" || finalUrl.hostname !== target.hostname) {
+      throw new Error("redirected outside the original HTTPS host");
+    }
     return {
       id: source.id,
       name: source.name,
@@ -89,6 +180,8 @@ async function scrapeSource(source) {
       title: readMeta(result.html, "og:title") || readTitle(result.html),
       description: readMeta(result.html, "og:description") || readMeta(result.html, "description"),
       status: result.status,
+      attempts: result.attempts || 1,
+      robotsChecked: robots.checked,
       ok: true,
       durationMs: Date.now() - started,
       fetchedAt: new Date().toISOString()
@@ -119,6 +212,7 @@ const snapshot = {
   sourceCount: results.length,
   successfulCount: results.filter(function (x) { return x.ok; }).length,
   failedCount: results.filter(function (x) { return !x.ok; }).length,
+  blockedCount: results.filter(function (x) { return x.blockedByRobots; }).length,
   sources: results
 };
 
