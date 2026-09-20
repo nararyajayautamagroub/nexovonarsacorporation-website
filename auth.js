@@ -50,6 +50,10 @@
   }
 
   function showMessage(text,ok){message(text,ok!==false)}
+  async function invoke(task){
+    try{return await task()}
+    catch(error){message(error&&error.message?error.message:"Authentication request failed.",false);return {error:error}}
+  }
 
   function mount(){
     if(document.getElementById("authModal"))return;
@@ -152,7 +156,7 @@
     var email=document.getElementById("authEmail").value.trim();
     var password=document.getElementById("authPassword").value;
     message(window.NX_T?window.NX_T("common.loading"):"Loading...",true);
-    var result=await client.auth.signInWithPassword({email:email,password:password});
+    var result=await invoke(function(){return client.auth.signInWithPassword({email:email,password:password})});
     if(result.error)message(result.error.message,false);else message("Login berhasil.",true);
   }
 
@@ -163,17 +167,17 @@
     var password=document.getElementById("authPassword").value;
     if(password.length<8){message("Password minimal 8 karakter.",false);return}
     message(window.NX_T?window.NX_T("common.loading"):"Loading...",true);
-    var result=await client.auth.signUp({
+    var result=await invoke(function(){return client.auth.signUp({
       email:email,password:password,
       options:{data:{full_name:name,name:name},emailRedirectTo:getRedirect()}
-    });
+    })});
     if(result.error)message(result.error.message,false);
     else message(result.data&&result.data.session?"Registrasi berhasil.":"Registrasi berhasil. Periksa email untuk verifikasi.",true);
   }
 
   async function google(){
     if(!client){message("Auth belum dikonfigurasi.",false);return}
-    var result=await client.auth.signInWithOAuth({provider:"google",options:{redirectTo:getRedirect()}});
+    var result=await invoke(function(){return client.auth.signInWithOAuth({provider:"google",options:{redirectTo:getRedirect()}})});
     if(result.error)message(result.error.message,false);
   }
 
@@ -181,7 +185,7 @@
     if(!client){message("Auth belum dikonfigurasi.",false);return}
     var email=document.getElementById("authEmail")&&document.getElementById("authEmail").value.trim();
     if(!email){message("Masukkan email terlebih dahulu.",false);return}
-    var result=await client.auth.resetPasswordForEmail(email,{redirectTo:getRedirect()});
+    var result=await invoke(function(){return client.auth.resetPasswordForEmail(email,{redirectTo:getRedirect()})});
     if(result.error)message(result.error.message,false);else message("Link reset password telah dikirim jika email valid.",true);
   }
 
@@ -192,7 +196,7 @@
     if(password.length<8){message(window.NX_T?window.NX_T("common.passwordTooShort"):"Password must contain at least 8 characters.",false);return}
     if(password!==confirm){message(window.NX_T?window.NX_T("common.passwordMismatch"):"Passwords do not match.",false);return}
     message(window.NX_T?window.NX_T("common.loading"):"Loading...",true);
-    var result=await client.auth.updateUser({password:password});
+    var result=await invoke(function(){return client.auth.updateUser({password:password})});
     if(result.error){message(result.error.message,false);return}
     state.recovery=false;
     history.replaceState(null,"",window.location.pathname+window.location.search);
@@ -208,7 +212,7 @@
     if(password&&password.length<8){message("Password must contain at least 8 characters.",false);return}
     var update={data:{full_name:name,name:name}};
     if(password)update.password=password;
-    var result=await client.auth.updateUser(update);
+    var result=await invoke(function(){return client.auth.updateUser(update)});
     if(result.error)message(result.error.message,false);else{
       message(password?"Profile and password updated.":"Profile updated.",true);
       var input=document.getElementById("authNewPassword");if(input)input.value="";
@@ -217,19 +221,28 @@
 
   async function resendVerification(){
     if(!client||!state.user||!state.user.email){message("Verification email is unavailable.",false);return}
-    var result=await client.auth.resend({
+    var result=await invoke(function(){return client.auth.resend({
       type:"signup",
       email:state.user.email,
       options:{emailRedirectTo:getRedirect()}
-    });
+    })});
     if(result.error)message(result.error.message,false);else message("Verification email request sent.",true);
   }
 
   async function logout(){
     state.recovery=false;
-    if(client)await client.auth.signOut();
+    if(client){
+      try{await client.auth.signOut()}catch(error){message(error&&error.message?error.message:"Logout failed.",false)}
+    }
     close();
   }
+
+  document.addEventListener("keydown",function(ev){
+    if(ev.key==="Escape"){
+      var modal=document.getElementById("authModal");
+      if(modal&&modal.classList.contains("show"))close();
+    }
+  });
 
   window.NX_AUTH={
     init:init,
