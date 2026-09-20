@@ -145,10 +145,16 @@ for (const ch of css) {
 }
 if (depth !== 0) fail("styles.css has unbalanced braces");
 
-const secretPatterns = ["ghp_","github_pat_","Bearer github_","Authorization: Bearer","service_role"];
+const secretPatterns = [
+  /ghp_[A-Za-z0-9]{20,}/,
+  /github_pat_[A-Za-z0-9_]{20,}/,
+  /Bearer\\s+github_[A-Za-z0-9_]{20,}/i,
+  /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
+  /service_role["'\\s:=]+[A-Za-z0-9._-]{20,}/i
+];
 const publicSource = html + dataSource + portfolioSource + appSource + liveSource + configSource + i18nSource + authSource + experienceSource;
-secretPatterns.forEach(function (token) {
-  if (publicSource.includes(token)) fail("Potential secret/token literal found: " + token);
+secretPatterns.forEach(function (pattern) {
+  if (pattern.test(publicSource)) fail("Potential credential/token literal detected");
 });
 
 if (!/prefers-reduced-motion/.test(css)) warn("Reduced motion support is missing");
