@@ -66,11 +66,16 @@
     if(!user)return;
     var t=window.NX_T||function(x){return x};
     var account=window.NX_AUTH&&window.NX_AUTH.getUser();
-    user.innerHTML='<button class="account-chip" id="accountChip" type="button"><span class="account-avatar">'+e(account?(account.email||"A").slice(0,1).toUpperCase():"G")+'</span><span>'+e(account?(account.user_metadata&&((account.user_metadata.full_name||account.user_metadata.name))||account.email:t("common.login")):t("common.login"))+'</span></button>';
+    var displayName=t("common.login");
+    if(account){
+      var meta=account.user_metadata||{};
+      displayName=meta.full_name||meta.name||account.email||"Account";
+    }
+    var avatar=account?(String(displayName).slice(0,1).toUpperCase()||"A"):"G";
+    user.innerHTML='<button class="account-chip" id="accountChip" type="button"><span class="account-avatar">'+e(avatar)+'</span><span>'+e(displayName)+'</span></button>';
     var chip=document.getElementById("accountChip");
     if(chip)chip.onclick=function(){if(window.NX_AUTH)window.NX_AUTH.open(account?"login":"login")};
   }
-
   function localizeNav(){
     var t=window.NX_T||function(x){return x};
     document.querySelectorAll("#nav button").forEach(function(button){
