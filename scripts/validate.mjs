@@ -6,7 +6,8 @@ const required = [
   "index.html","styles.css","data.js","portfolio.js","app.js","github-live.js",
   "external-live.js","sync-config.json","scrape-config.json",
   "scripts/sync-github.mjs","scripts/scrape-public.mjs","scripts/smoke-test.mjs","config.js","config.example.js",
-  "i18n.js","auth.js","experience.js","sw.js","pwa-manifest.webmanifest","icons/icon.svg","icons/icon-192.svg","icons/icon-512.svg"
+  "i18n.js","auth.js","experience.js","sw.js","pwa-manifest.webmanifest","icons/icon.svg","icons/icon-192.svg","icons/icon-512.svg",
+  "package.json","gateway/server.mjs","gateway/test.mjs"
 ];
 const errors = [];
 const warnings = [];
@@ -46,7 +47,7 @@ for (const path of required) {
   try { await fs.access(path); } catch { fail("Missing required file: " + path); }
 }
 
-for (const path of ["data.js","portfolio.js","app.js","github-live.js","external-live.js","config.js","i18n.js","auth.js","experience.js","scripts/sync-github.mjs","scripts/scrape-public.mjs"]) {
+for (const path of ["data.js","portfolio.js","app.js","github-live.js","external-live.js","config.js","config.example.js","i18n.js","auth.js","experience.js","sw.js","gateway/server.mjs","gateway/test.mjs","scripts/sync-github.mjs","scripts/scrape-public.mjs","scripts/smoke-test.mjs"]) {
   nodeCheck(path);
 }
 
@@ -65,7 +66,7 @@ const experienceSource = await read("experience.js");
 for (const src of ["data.js","portfolio.js","github-live.js","external-live.js","config.js","i18n.js","auth.js","experience.js","app.js"]) {
   if (!html.includes('src="' + src + '"')) fail("index.html does not load " + src);
 }
-for (const id of ["nav","page","modal","toast","menu","sidebar","crumb"]) {
+for (const id of ["nav","page","modal","toast","menu","sidebar","crumb","site-footer"]) {
   if (!html.includes('id="' + id + '"')) fail("Missing DOM id: " + id);
 }
 
@@ -114,6 +115,11 @@ const scrapeData = scrapeWindow.SCRAPE_LIVE_DATA;
 if (!scrapeData || !Array.isArray(scrapeData.sources)) fail("SCRAPE_LIVE_DATA.sources is missing");
 if (scrapeData && Number(scrapeData.blockedCount||0) < 0) fail("SCRAPE_LIVE_DATA.blockedCount is invalid");
 
+const packageConfig=JSON.parse(await read("package.json"));
+if(packageConfig.version!=="5.3.0") fail("package.json version must be 5.3.0");
+if(!packageConfig.scripts||!packageConfig.scripts.test||!packageConfig.scripts["test:gateway"]) fail("npm scripts are incomplete");
+if(!packageConfig.engines||!packageConfig.engines.node||!packageConfig.engines.npm) fail("npm engine requirements are missing");
+if(packageConfig.dependencies&&Object.keys(packageConfig.dependencies).length) warn("Frontend package declares runtime dependencies; verify npm install on every deployment.");
 const scrapeConfig = JSON.parse(await read("scrape-config.json"));
 unique((scrapeConfig.sources || []).map(function (x) { return x.id; }), "scraper source id");
 for (const source of scrapeConfig.sources || []) {
