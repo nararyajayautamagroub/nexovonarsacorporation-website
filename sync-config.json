@@ -47,5 +47,5 @@
   ],
   "version": 3,
   "includeConfiguredRepositories": true,
-  "lastPipelineRevision": "2026.09.20-v4-auth-i18n-responsive"
+  "lastPipelineRevision": "2026.09.20-v5.2.0-smoke-auth-pwa"
 }
