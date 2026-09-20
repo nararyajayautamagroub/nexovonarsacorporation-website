@@ -3,11 +3,36 @@
   "timeoutMs": 12000,
   "maxBytes": 1500000,
   "sources": [
-    {"id":"corporate-control-center","name":"NEXOVONARSA Corporate Control Center","url":"https://github.com/nararyajayautamagroub/nexovonarsacorporation-website"},
-    {"id":"nararya-garage","name":"Nararya Garage Website Repository","url":"https://github.com/nararyajayautamagroub/nararyagarage-website"},
-    {"id":"nararya-studio","name":"Nararya Studio Website Repository","url":"https://github.com/nararyajayautamagroub/nararyastudio-website"},
-    {"id":"narasa-cakra-perwana","name":"NARASA CAKRA PERWANA Website Repository","url":"https://github.com/nararyajayautamagroub/narasacakraperwana-website"},
-    {"id":"nararya-bot-discord","name":"Nararya Discord Bot Repository","url":"https://github.com/nararyajayautamagroub/nararya-bot-discord"},
-    {"id":"modbussid-converter","name":"MODBUSSID Converter Repository","url":"https://github.com/nararyajayautamagroub/modbussid-converter"}
-  ]
+    {
+      "id": "corporate-control-center",
+      "name": "NEXOVONARSA Corporate Control Center",
+      "url": "https://github.com/nararyajayautamagroub/nexovonarsacorporation-website"
+    },
+    {
+      "id": "nararya-garage",
+      "name": "Nararya Garage Website Repository",
+      "url": "https://github.com/nararyajayautamagroub/nararyagarage-website"
+    },
+    {
+      "id": "nararya-studio",
+      "name": "Nararya Studio Website Repository",
+      "url": "https://github.com/nararyajayautamagroub/nararyastudio-website"
+    },
+    {
+      "id": "narasa-cakra-perwana",
+      "name": "NARASA CAKRA PERWANA Website Repository",
+      "url": "https://github.com/nararyajayautamagroub/narasacakraperwana-website"
+    },
+    {
+      "id": "nararya-bot-discord",
+      "name": "Nararya Discord Bot Repository",
+      "url": "https://github.com/nararyajayautamagroub/nararya-bot-discord"
+    },
+    {
+      "id": "modbussid-converter",
+      "name": "MODBUSSID Converter Repository",
+      "url": "https://github.com/nararyajayautamagroub/modbussid-converter"
+    }
+  ],
+  "revision": "2026.09.20-v4"
 }
