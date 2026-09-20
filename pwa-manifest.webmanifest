@@ -1,11 +1,31 @@
 {
   "name": "NEXOVONARSA CORPORATION",
   "short_name": "NEXOVONARSA",
-  "description": "NEXOVONARSA CORPORATION Project Control Center v4",
+  "description": "NEXOVONARSA CORPORATION Project Control Center v5",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#070a0e",
   "theme_color": "#1677ff",
   "lang": "id",
-  "icons": []
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "./"
 }
