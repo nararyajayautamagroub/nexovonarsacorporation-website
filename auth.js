@@ -15,8 +15,8 @@
   }
 
   function init(){
-    state.configured=configured();
-    if(state.configured && window.supabase&&window.supabase.createClient){
+    state.configured=configured() && !!window.supabase && !!window.supabase.createClient;
+    if(state.configured){
       client=window.supabase.createClient(
         window.NX_CONFIG.supabase.url,
         window.NX_CONFIG.supabase.publishableKey,
@@ -127,7 +127,7 @@
     document.getElementById("authForm").onsubmit=function(ev){ev.preventDefault();mode==="login"?login():register()};
     document.getElementById("authGoogle").onclick=google;
     document.getElementById("authForgot").onclick=resetPassword;
-    message(state.configured?"":"Supabase Auth belum dikonfigurasi. Isi config.js dengan URL project dan publishable key untuk mengaktifkan akun.",false);
+    message(state.configured?"":"Supabase Auth belum siap. Periksa config.js dan koneksi CDN Supabase sebelum mengaktifkan akun.",false);
   }
 
   async function login(){
