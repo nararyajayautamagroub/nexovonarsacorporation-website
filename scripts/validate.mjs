@@ -159,8 +159,17 @@ secretPatterns.forEach(function (pattern) {
 
 if (!/prefers-reduced-motion/.test(css)) warn("Reduced motion support is missing");
 if (scrapeData && scrapeData.failedCount > 0) warn("Generated scraper snapshot contains " + scrapeData.failedCount + " failed source(s)");
-if (!/signInWithPassword/.test(authSource) || !/signUp/.test(authSource) || !/signInWithOAuth/.test(authSource) || !/provider:"google"/.test(authSource)) {
+if (!/signInWithPassword/.test(authSource) ||
+    !/signUp/.test(authSource) ||
+    !/signInWithOAuth/.test(authSource) ||
+    !/provider:"google"/.test(authSource) ||
+    !/resetPasswordForEmail/.test(authSource) ||
+    !/updateUser/.test(authSource) ||
+    !/resend/.test(authSource)) {
   fail("Authentication module is missing one or more required auth flows");
+}
+if (!/createClient/.test(authSource) || !/autoRefreshToken:true/.test(authSource) || !/persistSession:true/.test(authSource)) {
+  fail("Supabase auth client configuration is incomplete");
 }
 const supportedCodes=["id","en","ms","vi","th","zh","ja","ko","ar","es"];
 supportedCodes.forEach(function(code){
