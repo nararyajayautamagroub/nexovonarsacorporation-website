@@ -1,6 +1,6 @@
 (function(){
   var keys={language:"nx-language",theme:"nx-theme",motion:"nx-motion",refresh:"nx-refresh"};
-  var defaults={theme:"dark",motion:true,refresh:true};
+  var defaults={theme:"dark",motion:"true",refresh:"true"};
 
   function get(key,fallback){var value=localStorage.getItem(keys[key]);return value==null?fallback:value}
   function set(key,value){localStorage.setItem(keys[key],String(value))}
