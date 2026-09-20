@@ -34,7 +34,8 @@ Object.assign(window.NX_I18N.ar.common,{confirmPassword:"تأكيد كلمة ا�
 Object.assign(window.NX_I18N.es.common,{confirmPassword:"Confirmar contraseña",setPassword:"Establecer contraseña",passwordTooShort:"La contraseña debe tener al menos 8 caracteres",passwordMismatch:"Las contraseñas no coinciden",passwordUpdated:"Contraseña actualizada correctamente"});
 
 (function(){
-  var saved=localStorage.getItem("nx-language");
+  var saved=null;
+  try{saved=localStorage.getItem("nx-language")}catch(error){saved=null}
   var fallback=window.NX_CONFIG&&window.NX_CONFIG.app&&window.NX_CONFIG.app.defaultLanguage||"id";
   window.NX_LANG=window.NX_I18N[saved]?saved:fallback;
   window.NX_T=function(key){
