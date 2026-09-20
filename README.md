@@ -16,6 +16,10 @@ Internal-style single-page dashboard for monitoring the 2026–2030 corporate pr
 - System Health page for automated telemetry and integrity checks
 - Scraper Sources page for public metadata monitoring
 - Automated repository validator for data, routes, links and source integrity
+- 10-language interface: Indonesia, English, Melayu, Tiếng Việt, ไทย, 简体中文, 日本語, 한국어, العربية, Español
+- Email/password login, registration, password reset and Google OAuth UI
+- Account/profile state and settings for language, theme, reduced motion and auto-refresh
+- PWA shell and responsive touch-friendly layout for desktop, tablet and mobile
 - Static deployment, no build step required
 
 ## Files
@@ -79,3 +83,12 @@ The **Corporate Quality Gate** runs `scripts/validate.mjs` on pushes and pull re
 The scraper is intentionally metadata-only. It fetches configured public HTTPS pages, records title/description/canonical URL/HTTP status/fetch timing, and never requires credentials or private cookies. A failed public source is reported in the dashboard instead of being silently treated as healthy.
 
 The **System Health** page is an operational view of the latest generated snapshots. It does not invent project progress, PIC, budget or target values; unknown operational values remain **TBD**.
+
+
+## Authentication and localization
+
+Authentication is implemented with Supabase Auth in the browser. The repository contains a safe placeholder in `config.js`; replace only the Supabase project URL and publishable browser key. Never place a `service_role` credential in browser code.
+
+Google Sign-In requires the Google OAuth client plus Google provider configuration in Supabase. The setup steps are documented in [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md).
+
+The UI provides ten selectable languages and persists the selection locally. Theme, reduced motion and auto-refresh are also user settings. Authentication sessions are persisted by Supabase Auth rather than by storing raw passwords in the application.
