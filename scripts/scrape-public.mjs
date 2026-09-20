@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 
 const config = JSON.parse(await fs.readFile("scrape-config.json", "utf8"));
 const OUTPUT = "external-live.js";
-const USER_AGENT = "NEXOVONARSA-Corporate-Scraper/2.0 (+GitHub Actions)";
+const USER_AGENT = String(config.userAgent || "NEXOVONARSA-Corporate-Scraper/4.0 (+GitHub Actions)").trim();
 
 function decodeEntities(value) {
   return String(value || "")
@@ -119,9 +119,11 @@ async function fetchText(url, timeoutMs, maxBytes) {
       });
       const retryable = response.status === 408 || response.status === 425 || response.status === 429 || response.status >= 500;
       if (response.ok) {
+        const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+        if (contentType && !/(text\/html|application\/xhtml\+xml|text\/plain)/.test(contentType)) throw new Error("unsupported content type: " + contentType.split(";")[0]);
         const html = await response.text();
         if (Buffer.byteLength(html, "utf8") > maxBytes) throw new Error("response exceeds " + maxBytes + " bytes");
-        return { html, status: response.status, finalUrl: response.url, attempts: attempt + 1 };
+        return { html, status: response.status, finalUrl: response.url, contentType, attempts: attempt + 1 };
       }
       if (!retryable || attempt === retries) throw new Error("HTTP " + response.status + " " + response.statusText);
       await wait(retryDelay(response, baseDelay, attempt));
@@ -180,8 +182,10 @@ async function scrapeSource(source) {
       title: readMeta(result.html, "og:title") || readTitle(result.html),
       description: readMeta(result.html, "og:description") || readMeta(result.html, "description"),
       status: result.status,
+      contentType: result.contentType || null,
       attempts: result.attempts || 1,
       robotsChecked: robots.checked,
+      robotsStatus: robots.status || null,
       ok: true,
       durationMs: Date.now() - started,
       fetchedAt: new Date().toISOString()
@@ -207,7 +211,7 @@ const results = [];
 for (const source of config.sources) results.push(await scrapeSource(source));
 
 const snapshot = {
-  version: 2,
+  version: 3,
   generatedAt: new Date().toISOString(),
   sourceCount: results.length,
   successfulCount: results.filter(function (x) { return x.ok; }).length,
