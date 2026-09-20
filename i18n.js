@@ -22,6 +22,17 @@ Object.assign(window.NX_I18N.ko.common,{newPassword:"새 비밀번호",resendVer
 Object.assign(window.NX_I18N.ar.common,{newPassword:"كلمة مرور جديدة",resendVerification:"إعادة إرسال التحقق"});
 Object.assign(window.NX_I18N.es.common,{newPassword:"Nueva contraseña",resendVerification:"Reenviar verificación"});
 
+Object.assign(window.NX_I18N.id.common,{confirmPassword:"Konfirmasi password",setPassword:"Tetapkan password",passwordTooShort:"Password minimal 8 karakter",passwordMismatch:"Password tidak sama",passwordUpdated:"Password berhasil diperbarui"});
+Object.assign(window.NX_I18N.en.common,{confirmPassword:"Confirm password",setPassword:"Set password",passwordTooShort:"Password must contain at least 8 characters",passwordMismatch:"Passwords do not match",passwordUpdated:"Password updated successfully"});
+Object.assign(window.NX_I18N.ms.common,{confirmPassword:"Sahkan kata laluan",setPassword:"Tetapkan kata laluan",passwordTooShort:"Kata laluan mesti sekurang-kurangnya 8 aksara",passwordMismatch:"Kata laluan tidak sepadan",passwordUpdated:"Kata laluan berjaya dikemas kini"});
+Object.assign(window.NX_I18N.vi.common,{confirmPassword:"Xác nhận mật khẩu",setPassword:"Đặt mật khẩu",passwordTooShort:"Mật khẩu phải có ít nhất 8 ký tự",passwordMismatch:"Mật khẩu không khớp",passwordUpdated:"Đã cập nhật mật khẩu"});
+Object.assign(window.NX_I18N.th.common,{confirmPassword:"ยืนยันรหัสผ่าน",setPassword:"ตั้งรหัสผ่าน",passwordTooShort:"รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",passwordMismatch:"รหัสผ่านไม่ตรงกัน",passwordUpdated:"อัปเดตรหัสผ่านแล้ว"});
+Object.assign(window.NX_I18N.zh.common,{confirmPassword:"确认密码",setPassword:"设置密码",passwordTooShort:"密码至少需要 8 个字符",passwordMismatch:"两次密码不一致",passwordUpdated:"密码已更新"});
+Object.assign(window.NX_I18N.ja.common,{confirmPassword:"パスワードを確認",setPassword:"パスワードを設定",passwordTooShort:"パスワードは8文字以上必要です",passwordMismatch:"パスワードが一致しません",passwordUpdated:"パスワードを更新しました"});
+Object.assign(window.NX_I18N.ko.common,{confirmPassword:"비밀번호 확인",setPassword:"비밀번호 설정",passwordTooShort:"비밀번호는 8자 이상이어야 합니다",passwordMismatch:"비밀번호가 일치하지 않습니다",passwordUpdated:"비밀번호가 업데이트되었습니다"});
+Object.assign(window.NX_I18N.ar.common,{confirmPassword:"تأكيد كلمة المرور",setPassword:"تعيين كلمة المرور",passwordTooShort:"يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",passwordMismatch:"كلمتا المرور غير متطابقتين",passwordUpdated:"تم تحديث كلمة المرور بنجاح"});
+Object.assign(window.NX_I18N.es.common,{confirmPassword:"Confirmar contraseña",setPassword:"Establecer contraseña",passwordTooShort:"La contraseña debe tener al menos 8 caracteres",passwordMismatch:"Las contraseñas no coinciden",passwordUpdated:"Contraseña actualizada correctamente"});
+
 (function(){
   var saved=localStorage.getItem("nx-language");
   var fallback=window.NX_CONFIG&&window.NX_CONFIG.app&&window.NX_CONFIG.app.defaultLanguage||"id";
