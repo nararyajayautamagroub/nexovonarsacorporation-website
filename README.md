@@ -29,10 +29,10 @@ Internal-style single-page dashboard for monitoring the 2026–2030 corporate pr
 - `portfolio.js` — project portfolio baseline
 - `app.js` — dashboard logic, filters, detail view and CSV export
 - `scripts/sync-github.mjs` — GitHub repository intelligence sync
-- `scripts/scrape-public.mjs` — public HTTPS metadata scraper
+- `scripts/scrape-public.mjs` — public HTTPS metadata scraper with robots, retries, size/type/redirect safety and generated telemetry
 - `scripts/validate.mjs` — automated structural/data validation
 - `scrape-config.json` — public scraper source registry
-- `external-live.js` — generated scraper snapshot
+- `external-live.js` — generated scraper snapshot\n- `icons/` — installable PWA icon assets
 - `.github/workflows/deploy.yml` — GitHub Pages deployment
 
 ## Data governance
@@ -89,6 +89,6 @@ The **System Health** page is an operational view of the latest generated snapsh
 
 Authentication is implemented with Supabase Auth in the browser. The repository contains a safe placeholder in `config.js`; replace only the Supabase project URL and publishable browser key. Never place a `service_role` credential in browser code.
 
-Google Sign-In requires the Google OAuth client plus Google provider configuration in Supabase. The setup steps are documented in [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md).
+Google Sign-In requires the Google OAuth client plus Google provider configuration in Supabase. The setup steps are documented in [docs/AUTH_SETUP.md](docs/AUTH_SETUP.md). For GitHub Pages, the deploy workflow can generate the published `config.js` from repository secrets `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; the source repository keeps only safe placeholders.
 
 The UI provides ten selectable languages and persists the selection locally. Theme, reduced motion and auto-refresh are also user settings. Authentication sessions are persisted by Supabase Auth rather than by storing raw passwords in the application.
