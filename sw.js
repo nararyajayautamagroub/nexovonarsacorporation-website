@@ -1,5 +1,5 @@
-const CACHE="nx-corporate-v4";
-const SHELL=["./","./index.html","./styles.css","./data.js","./portfolio.js","./github-live.js","./external-live.js","./config.js","./i18n.js","./auth.js","./experience.js"];
+const CACHE="nx-corporate-v5";
+const SHELL=["./","./index.html","./styles.css","./data.js","./portfolio.js","./github-live.js","./external-live.js","./config.js","./i18n.js","./auth.js","./experience.js","./app.js","./pwa-manifest.webmanifest","./icons/icon.svg","./icons/icon-192.svg","./icons/icon-512.svg"];
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
