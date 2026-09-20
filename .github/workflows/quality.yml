@@ -15,13 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Syntax check
-        run: |
-          node --check app.js
-          node --check data.js
-          node --check portfolio.js
-          node --check github-live.js
-          node --check scripts/sync-github.mjs
+      - name: Full repository validation
+        run: node scripts/validate.mjs
       - name: Data bootstrap check
         run: |
           node - <<'NODE'
