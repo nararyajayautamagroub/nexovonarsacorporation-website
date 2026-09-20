@@ -6,14 +6,14 @@ The website uses Supabase Auth for email/password registration, password login, 
 
 Create a Supabase project and copy the project URL plus the publishable browser key.
 
-Put them only in `config.js`:
+For local development, put them only in `config.js`:
 
 ```js
 window.NX_CONFIG.supabase.url = "https://YOUR-PROJECT.supabase.co";
 window.NX_CONFIG.supabase.publishableKey = "YOUR_SUPABASE_PUBLISHABLE_KEY";
 ```
 
-Never put a Supabase `service_role` key in `config.js`, browser JavaScript or GitHub Pages. The browser integration is intentionally limited to the publishable/anon credential.
+Never put a Supabase `service_role` key in `config.js`, browser JavaScript or GitHub Pages. The browser integration is intentionally limited to the publishable/anon credential. For the GitHub Pages deployment, add repository secrets named `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; the deploy workflow injects them only into the generated `gh-pages` artifact.
 
 ## 2. Enable email authentication
 
@@ -50,7 +50,7 @@ Also add the local development origin when testing locally.
 
 The login dialog includes password reset. Supabase sends the reset flow back to the same application origin configured in `config.js`.
 
-## 5. Settings
+## 5. Deployment authentication\n\nThe production deployment reads `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from GitHub Actions repository secrets when both are present. The generated `gh-pages/config.js` keeps the browser publishable key and dynamic `window.location.origin + window.location.pathname` redirect. If the secrets are not configured, deployment intentionally keeps the safe placeholder and authentication remains disabled.\n\n## 6. Settings
 
 The website stores language, theme, reduced-motion and auto-refresh preferences in browser storage. Authentication state is handled by Supabase Auth.
 
