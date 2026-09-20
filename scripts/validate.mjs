@@ -5,7 +5,7 @@ import vm from "node:vm";
 const required = [
   "index.html","styles.css","data.js","portfolio.js","app.js","github-live.js",
   "external-live.js","sync-config.json","scrape-config.json",
-  "scripts/sync-github.mjs","scripts/scrape-public.mjs","config.js","config.example.js",
+  "scripts/sync-github.mjs","scripts/scrape-public.mjs","scripts/smoke-test.mjs","config.js","config.example.js",
   "i18n.js","auth.js","experience.js","sw.js","pwa-manifest.webmanifest","icons/icon.svg","icons/icon-192.svg","icons/icon-512.svg"
 ];
 const errors = [];
