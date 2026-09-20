@@ -2,8 +2,11 @@
   var keys={language:"nx-language",theme:"nx-theme",motion:"nx-motion",refresh:"nx-refresh"};
   var defaults={theme:"dark",motion:"true",refresh:"true"};
 
-  function get(key,fallback){var value=localStorage.getItem(keys[key]);return value==null?fallback:value}
-  function set(key,value){localStorage.setItem(keys[key],String(value))}
+  function get(key,fallback){
+    try{var value=localStorage.getItem(keys[key]);return value==null?fallback:value}catch(error){return fallback}
+  }
+  function set(key,value){try{localStorage.setItem(keys[key],String(value))}catch(error){}}
+  function storageSet(key,value){set(key,value)}
   function translate(value){return window.NX_I18N&&window.NX_I18N[value]||null}
 
   function apply(){
@@ -47,7 +50,7 @@
     var refresh=document.getElementById("settingRefresh");
     if(lang)lang.onchange=function(){
       var code=lang.value;
-      localStorage.setItem(keys.language,code);
+      storageSet("language",code);
       window.NX_LANG=code;
       apply();
       if(typeof render==="function")render();
