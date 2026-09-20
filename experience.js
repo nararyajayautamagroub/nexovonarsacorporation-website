@@ -29,7 +29,7 @@
     var motion=get("motion",defaults.motion)==="true";
     var refresh=get("refresh",defaults.refresh)==="true";
     var user=window.NX_AUTH&&window.NX_AUTH.getUser();
-    return H(t("common.settings"),"NEXOVONARSA CORPORATION · Preferences, appearance and account",
+    return H(t("nav.settings"),"NEXOVONARSA CORPORATION · Preferences, appearance and account",
       '<button class="btn" id="settingsAccount">'+e(user?t("common.account"):t("common.login"))+'</button>')+
       '<div class="grid settings-grid">'+
       C(t("common.appearance"),'<label class="setting-row"><span>'+e(t("common.language"))+'</span><select class="select" id="settingLanguage">'+languageOptions+'</select></label>'+
@@ -92,15 +92,22 @@
     if(P&&P.page==="settings")bindSettings();
   }
 
+  function scheduleRefresh(){
+    if(window.NX_REFRESH_TIMER)clearInterval(window.NX_REFRESH_TIMER);
+    if(get("refresh",defaults.refresh)!=="true")return;
+    var minutes=window.NX_CONFIG&&window.NX_CONFIG.app&&Number(window.NX_CONFIG.app.autoRefreshMinutes)||15;
+    window.NX_REFRESH_TIMER=setInterval(function(){if(document.visibilityState==="visible")window.location.reload()},Math.max(1,minutes)*60000);
+  }
   function start(){
     apply();
     if(navigator.serviceWorker&&window.isSecureContext){
       navigator.serviceWorker.register("./sw.js").catch(function(){});
     }
+    scheduleRefresh();
     afterRender();
   }
 
-  function afterAuth(){afterRender()}
+  function afterAuth(){afterRender();scheduleRefresh()}
 
   function openSettings(){if(typeof P!=="undefined"){P.page="settings";if(typeof render==="function")render()}}
 
