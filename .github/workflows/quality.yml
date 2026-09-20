@@ -17,6 +17,9 @@ jobs:
       - uses: actions/checkout@v5
       - name: Full repository validation
         run: node scripts/validate.mjs
+      - name: Browser route smoke test
+        run: node scripts/smoke-test.mjs
+
       - name: Data bootstrap check
         run: |
           node - <<'NODE'
