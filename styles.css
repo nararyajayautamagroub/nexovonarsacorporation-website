@@ -214,3 +214,10 @@ img,svg,video{max-width:100%;height:auto}
 .auth-stack input{width:100%;border:1px solid var(--line);background:#080c11;color:var(--text);border-radius:8px;padding:11px 12px;outline:none}
 .auth-stack input:focus{border-color:var(--action);box-shadow:0 0 0 2px rgba(22,119,255,.12)}
 .auth-stack input:disabled{opacity:.55;cursor:not-allowed}
+
+/* v5.3 gateway/footer layer */
+#site-footer{max-width:1500px;margin:0 auto;padding:18px 30px calc(22px + env(safe-area-inset-bottom));display:flex;justify-content:center;align-items:center;border-top:1px solid var(--line);color:#697580;font-size:9px;letter-spacing:.08em;text-align:center;text-transform:uppercase}
+#site-footer strong{font-weight:800;color:#aab5be}
+@media(max-width:760px){#site-footer{padding:16px 14px calc(20px + env(safe-area-inset-bottom));font-size:8px}}
+:root[data-theme="light"] #site-footer{color:#65727e}
+:root[data-theme="light"] #site-footer strong{color:#53606b}
