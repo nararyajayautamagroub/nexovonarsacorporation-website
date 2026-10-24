@@ -32,9 +32,29 @@
       "id": "modbussid-converter",
       "name": "MODBUSSID Converter Repository",
       "url": "https://github.com/nararyajayautamagroub/modbussid-converter"
+    },
+    {
+      "id": "github-account-profile",
+      "name": "NEXOVONARSA GitHub Account Profile",
+      "url": "https://github.com/nararyajayautamagroub"
+    },
+    {
+      "id": "github-account-repositories",
+      "name": "NEXOVONARSA Public Repository Directory",
+      "url": "https://github.com/nararyajayautamagroub?tab=repositories"
+    },
+    {
+      "id": "corporate-live-pages",
+      "name": "NEXOVONARSA Corporate Live Website",
+      "url": "https://nararyajayautamagroub.github.io/nexovonarsacorporation-website/"
+    },
+    {
+      "id": "github-actions-workflows",
+      "name": "NEXOVONARSA Corporate GitHub Actions",
+      "url": "https://github.com/nararyajayautamagroub/nexovonarsacorporation-website/actions"
     }
   ],
-  "revision": "2026.09.20-v5.1",
+  "revision": "2026.10.25-v5.4",
   "respectRobots": true,
   "maxRetries": 3,
   "baseBackoffMs": 800,
