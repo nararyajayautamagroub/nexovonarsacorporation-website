@@ -43,9 +43,21 @@
       "company": "HQ",
       "unit": "Corporate Headquarters",
       "project": "Corporate Project Control Center"
+    },
+    {
+      "name": "GameModAssetLab",
+      "company": "NJU",
+      "unit": "Nararya Studio / Game Mod Asset Lab",
+      "project": "Game Mod Asset Lab"
+    },
+    {
+      "name": "nararyagroub-strobo-generator-website",
+      "company": "NJU",
+      "unit": "Nararya Groub / Strobo Generator",
+      "project": "Strobo Generator Website"
     }
   ],
-  "version": 3,
+  "version": 4,
   "includeConfiguredRepositories": true,
-  "lastPipelineRevision": "2026.09.20-v5.2.0-smoke-auth-pwa"
+  "lastPipelineRevision": "2026.10.24-v5.3.0-repo-dedupe"
 }
