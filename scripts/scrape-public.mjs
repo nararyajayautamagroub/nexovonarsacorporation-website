@@ -212,7 +212,7 @@ if (!Array.isArray(config.sources) || config.sources.length === 0) {
 let previousSnapshot = null;
 try {
   const previousFile = await fs.readFile(OUTPUT, "utf8");
-  const match = previousFile.match(/^window\\.SCRAPE_LIVE_DATA=(.*);\\s*$/s);
+  const match = previousFile.match(/^window\.SCRAPE_LIVE_DATA=(.*);\s*$/s);
   if (match) previousSnapshot = JSON.parse(match[1]);
 } catch {
   // First run: there is no prior snapshot to preserve.
@@ -260,5 +260,5 @@ const snapshot = {
   sources: results
 };
 
-await fs.writeFile(OUTPUT, "window.SCRAPE_LIVE_DATA=" + JSON.stringify(snapshot) + ";\\n", "utf8");
+await fs.writeFile(OUTPUT, "window.SCRAPE_LIVE_DATA=" + JSON.stringify(snapshot) + ";\n", "utf8");
 console.log("Scraped " + snapshot.sourceCount + " public sources: " + snapshot.successfulCount + " fresh, " + snapshot.staleCount + " stale, " + snapshot.failedCount + " unavailable.");
