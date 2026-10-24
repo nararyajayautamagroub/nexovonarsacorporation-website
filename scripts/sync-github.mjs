@@ -32,7 +32,7 @@ async function paged(path, maxPages = 10) {
 }
 
 const config = JSON.parse(await fs.readFile("sync-config.json", "utf8"));
-const allowed = new Map(config.repositories.map(x => [x.name, x]));
+const allowed = new Map(config.repositories.map(x => [x.name.toLowerCase(), x]));
 let repos = [];
 
 try {
@@ -45,15 +45,15 @@ try {
 const discovered = new Map(
   repos
     .filter(r => r.owner?.login === OWNER)
-    .map(r => [r.name, r])
+    .map(r => [r.name.toLowerCase(), r])
 );
 const configuredNames = [...allowed.keys()];
 const missingConfigured = [];
 for (const name of configuredNames) {
-  if (discovered.has(name)) continue;
+  if (discovered.has(name.toLowerCase())) continue;
   try {
     const direct = await gh(`/repos/${OWNER}/${name}`);
-    if (direct?.owner?.login === OWNER) discovered.set(name, direct);
+    if (direct?.owner?.login === OWNER) discovered.set(name.toLowerCase(), direct);
     else missingConfigured.push({ name, reason: "not returned by API" });
   } catch (error) {
     missingConfigured.push({ name, reason: error && error.status ? String(error.status) : "access unavailable" });
@@ -61,11 +61,11 @@ for (const name of configuredNames) {
   }
 }
 
-const selected = [...discovered.values()];
+const selected = [...new Map([...discovered.values()].map(r => [r.full_name.toLowerCase(), r])).values()];
 const records = [];
 
 for (const r of selected) {
-  const cfg = allowed.get(r.name) || {
+  const cfg = allowed.get(r.name.toLowerCase()) || {
     company: "UNMAPPED",
     unit: "UNMAPPED",
     project: r.name
