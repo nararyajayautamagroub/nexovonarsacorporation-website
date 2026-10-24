@@ -207,18 +207,58 @@ if (!Array.isArray(config.sources) || config.sources.length === 0) {
   throw new Error("scrape-config.json must contain at least one source");
 }
 
+// Keep the last known good metadata when a source temporarily fails.
+// Stale values are explicitly marked so the UI can avoid presenting them as freshly verified.
+let previousSnapshot = null;
+try {
+  const previousFile = await fs.readFile(OUTPUT, "utf8");
+  const match = previousFile.match(/^window\\.SCRAPE_LIVE_DATA=(.*);\\s*$/s);
+  if (match) previousSnapshot = JSON.parse(match[1]);
+} catch {
+  // First run: there is no prior snapshot to preserve.
+}
+const previousById = new Map(
+  (previousSnapshot && Array.isArray(previousSnapshot.sources) ? previousSnapshot.sources : [])
+    .filter((source) => source && source.id)
+    .map((source) => [source.id, source])
+);
+
 const results = [];
-for (const source of config.sources) results.push(await scrapeSource(source));
+for (const source of config.sources) {
+  const current = await scrapeSource(source);
+  const previous = previousById.get(current.id);
+  if (!current.ok && previous && previous.ok && previous.title) {
+    results.push({
+      ...previous,
+      ok: false,
+      stale: true,
+      lastSuccessfulFetchAt: previous.lastSuccessfulFetchAt || previous.fetchedAt || null,
+      currentError: current.error || "Source unavailable",
+      currentStatus: current.status || null,
+      blockedByRobots: Boolean(current.blockedByRobots),
+      durationMs: current.durationMs,
+      fetchedAt: current.fetchedAt
+    });
+  } else {
+    results.push({
+      ...current,
+      stale: false,
+      lastSuccessfulFetchAt: current.ok ? current.fetchedAt : (previous && previous.lastSuccessfulFetchAt) || null
+    });
+  }
+}
 
 const snapshot = {
-  version: 3,
+  version: 4,
   generatedAt: new Date().toISOString(),
   sourceCount: results.length,
-  successfulCount: results.filter(function (x) { return x.ok; }).length,
+  successfulCount: results.filter(function (x) { return x.ok && !x.stale; }).length,
   failedCount: results.filter(function (x) { return !x.ok; }).length,
+  staleCount: results.filter(function (x) { return x.stale; }).length,
   blockedCount: results.filter(function (x) { return x.blockedByRobots; }).length,
+  freshness: results.some(function (x) { return x.stale; }) ? "degraded" : (results.some(function (x) { return !x.ok; }) ? "partial" : "current"),
   sources: results
 };
 
-await fs.writeFile(OUTPUT, "window.SCRAPE_LIVE_DATA=" + JSON.stringify(snapshot) + ";\n", "utf8");
-console.log("Scraped " + snapshot.sourceCount + " public sources: " + snapshot.successfulCount + " OK, " + snapshot.failedCount + " failed.");
+await fs.writeFile(OUTPUT, "window.SCRAPE_LIVE_DATA=" + JSON.stringify(snapshot) + ";\\n", "utf8");
+console.log("Scraped " + snapshot.sourceCount + " public sources: " + snapshot.successfulCount + " fresh, " + snapshot.staleCount + " stale, " + snapshot.failedCount + " unavailable.");
