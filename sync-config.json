@@ -55,9 +55,15 @@
       "company": "NJU",
       "unit": "Nararya Groub / Strobo Generator",
       "project": "Strobo Generator Website"
+    },
+    {
+      "name": "apkforge-ai",
+      "company": "NJU",
+      "unit": "APKForge AI / Modding Tools",
+      "project": "APKForge AI"
     }
   ],
-  "version": 4,
+  "version": 5,
   "includeConfiguredRepositories": true,
-  "lastPipelineRevision": "2026.10.24-v5.3.0-repo-dedupe"
+  "lastPipelineRevision": "2026.10.24-v5.3.1-sync-retry"
 }
